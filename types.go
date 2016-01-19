@@ -31,9 +31,10 @@ type Pak struct {
 }
 
 type Property struct {
-	Name    string      `yaml:"name"`
-	Type    string      `yaml:"type"`
-	Default interface{} `yaml:"default,omitempty"`
+	Name        string      `yaml:"name"`
+	Type        string      `yaml:"type"`
+	Description string      `yaml:"description,omitempty"`
+	Default     interface{} `yaml:"default,omitempty"`
 }
 
 type Repo struct {

@@ -10,5 +10,6 @@ resources:
 
 properties:
   - name: port
+    description: Listening port for redis
     type: int
     default: 6379
