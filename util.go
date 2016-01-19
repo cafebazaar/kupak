@@ -3,6 +3,7 @@ package kupak
 import (
 	"io/ioutil"
 	"net/http"
+	"path"
 	"strings"
 )
 
@@ -23,4 +24,8 @@ func fetchUrl(url string) ([]byte, error) {
 	} else {
 		return ioutil.ReadFile(url)
 	}
+}
+
+func joinUrl(baseUrl string, url string) string {
+	return path.Join(path.Dir(baseUrl), url)
 }

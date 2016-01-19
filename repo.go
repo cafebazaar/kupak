@@ -3,7 +3,6 @@ package kupak
 import (
 	"errors"
 	"gopkg.in/yaml.v2"
-	"path"
 )
 
 func RepoFromBytes(data []byte) (*Repo, error) {
@@ -62,7 +61,7 @@ func (r *Repo) HasVersion(pak string, version string) bool {
 func (r *Repo) Pak(pak string, version string) (*Pak, error) {
 	for i := range r.Index {
 		if r.Index[i].Name == pak && r.Index[i].Version == version {
-			url := path.Join(path.Dir(r.Url), r.Index[i].URL)
+			url := joinUrl(r.Url, r.Index[i].URL)
 			pak, err := PakFromUrl(url)
 			if err != nil {
 				return nil, err

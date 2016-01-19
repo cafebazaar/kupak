@@ -2,6 +2,7 @@ package kupak
 
 import (
 	"strings"
+	"text/template"
 )
 
 type PakInfo struct {
@@ -27,7 +28,7 @@ type Pak struct {
 	ResourceUrls []string   `yaml:"resources"`
 
 	// Populated from resources
-	Templates []string `yaml:""`
+	Templates []*template.Template `yaml:""`
 }
 
 type Property struct {
