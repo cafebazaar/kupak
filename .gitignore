@@ -1,0 +1,17 @@
+temp
+*~
+_obj
+_test
+
+*.prof
+*.o
+*.a
+*.so
+*.exe
+*.test
+
+.DS_Store
+*.sublime-workspace
+
+glide.lock
+vendor
