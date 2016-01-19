@@ -1,12 +1,10 @@
-package main
+package kupak
 
 import (
 	"errors"
-	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"path"
 	"strings"
 )
@@ -176,20 +174,4 @@ func fetchUrl(url string) ([]byte, error) {
 	} else {
 		return ioutil.ReadFile(url)
 	}
-}
-
-func main() {
-	repo, err := RepoFromUrl(os.Args[1])
-	if err != nil {
-		panic(err)
-	}
-	for i := range repo.Index {
-		fmt.Println(repo.Index[i].String())
-	}
-
-	pak, err := repo.Pak("redis", "1.0")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(pak.Name)
 }
