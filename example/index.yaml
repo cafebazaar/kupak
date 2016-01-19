@@ -1,0 +1,9 @@
+name: Main Repo
+maintainer: Ali Alaee::ali.alaee@gmail.com
+
+packages:
+  - name: redis
+    url: paks/redis-1.0/redis.yaml
+    version: 1.0
+    description: |
+      this is a description

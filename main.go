@@ -6,6 +6,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"path"
 	"strings"
 )
@@ -34,8 +35,10 @@ func (p *PakInfo) FormatedString() string {
 type Pak struct {
 	PakInfo      `yaml:",inline"`
 	Properties   []Property `yaml:"properties,omitempty"`
-	TemplateUrls []string   `yaml:"templates"`
-	Templates    []string   `yaml:""`
+	ResourceUrls []string   `yaml:"resources"`
+
+	// Populated from resources
+	Templates []string `yaml:""`
 }
 
 type Property struct {
@@ -146,7 +149,6 @@ func (r *Repo) Pak(pak string, version string) (*Pak, error) {
 	for i := range r.Index {
 		if r.Index[i].Name == pak && r.Index[i].Version == version {
 			url := path.Join(path.Dir(r.Url), r.Index[i].URL)
-			fmt.Println(url + "===")
 			pak, err := PakFromUrl(url)
 			if err != nil {
 				return nil, err
@@ -177,7 +179,7 @@ func fetchUrl(url string) ([]byte, error) {
 }
 
 func main() {
-	repo, err := RepoFromUrl("paks/index.yaml")
+	repo, err := RepoFromUrl(os.Args[1])
 	if err != nil {
 		panic(err)
 	}
@@ -185,7 +187,7 @@ func main() {
 		fmt.Println(repo.Index[i].String())
 	}
 
-	pak, err := repo.Pak("test", "1.0")
+	pak, err := repo.Pak("redis", "1.0")
 	if err != nil {
 		panic(err)
 	}

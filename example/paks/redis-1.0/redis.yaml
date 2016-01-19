@@ -1,0 +1,14 @@
+name: redis
+url: paks/redis-1.0/redis.yaml
+version: 1.0
+description: |
+  Reliable, Scalable Redis on Kubernetes
+
+resources:
+  - rc.yaml
+  - svc.yaml
+
+properties:
+  - name: port
+    type: int
+    default: 6379
