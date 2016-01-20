@@ -1,0 +1,4 @@
+package: kupak
+import:
+- package: github.com/codegangsta/cli
+- package: gopkg.in/yaml.v2
