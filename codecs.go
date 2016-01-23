@@ -1,7 +1,7 @@
 package kupak
 
 import (
-	"k8s.io/kubernetes/pkg/api"
+	//	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/api/unversioned"
 	"k8s.io/kubernetes/pkg/api/v1"
 	"k8s.io/kubernetes/pkg/apis/extensions/v1beta1"
@@ -17,7 +17,7 @@ type Object struct {
 
 type Metadata struct {
 	unversioned.TypeMeta `json:",inline"`
-	api.ObjectMeta       `json:"metadata,omitempty"`
+	v1.ObjectMeta        `json:"metadata,omitempty"`
 }
 
 func NewObject(data []byte,
@@ -105,7 +105,41 @@ func (o *Object) Bytes() ([]byte, error) {
 func (o *Object) Metadata() (*Metadata, error) {
 	meta := Metadata{}
 	return &meta, o.unmarshaller(o.data, &meta)
+}
 
+func (o *Object) SetLabels(labels map[string]string) error {
+
+}
+
+func (o *Object) SetAnnotations(Annotations map[string]string) error {
+
+}
+
+func (o *Object) SetInnerPodLabels(labels map[string]string) error {
+
+}
+
+func (o *Object) SetInnerPodAnnotations(Annotations map[string]string) error {
+
+}
+
+func (o *Object) InnerPodTemplateMetadata() (*Metadata, error) {
+	var spec *v1.PodTemplateSpec
+	switch o.kind {
+	case "ReplicationController":
+		spec = o.ReplicationController().Spec.Template
+	case "DaemonSet":
+		spec = o.DaemonSet().Spec.Template
+	case "Job":
+		spec = &o.Job().Spec.Template
+	case "Deployment":
+		spec = o.Deployment().Spec.Template
+	default:
+		return nil, nil
+	}
+	return &Metadata{
+		ObjectMeta: spec.ObjectMeta,
+	}, nil
 }
 
 func (o *Object) Kind() string {

@@ -66,7 +66,12 @@ func TestReplicationController(t *testing.T) {
 		t.Log("RC Error")
 		t.Fail()
 	}
-	obj.ReplicationController().Spec.Template.Labels["mode"] = "xxx"
-	t.Log(obj.ReplicationController().Spec.Template.Labels["mode"])
-	t.Fail()
+	meta, err := obj.InnerPodTemplateMetadata()
+	if err != nil {
+		t.Log("RC Inner Pod Error", err)
+	}
+	if meta.Labels["mode"] != "standalone" {
+		t.Log("RC Inner Pod Labels Error")
+		t.Fail()
+	}
 }
