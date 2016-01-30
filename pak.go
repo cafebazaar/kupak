@@ -47,9 +47,11 @@ func (p *Pak) fetchAndMakeTemplates(baseUrl string) error {
 	return nil
 }
 
-func (p *Pak) ExecuteTemplates(values map[string]interface{}) ([][]byte, error) {
+func (p *Pak) ExecuteTemplates(instance string, values map[string]interface{}) ([][]byte, error) {
 	// TODO validate values
+	// TODO copy values
 	outputs := make([][]byte, len(p.Templates))
+	values["instance"] = instance
 	for i := range p.Templates {
 		buffer := &bytes.Buffer{}
 		if err := p.valuesWithDefaults(values); err != nil {
