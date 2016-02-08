@@ -1,6 +1,7 @@
 package kupak
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"path"
@@ -28,4 +29,26 @@ func fetchUrl(url string) ([]byte, error) {
 
 func joinUrl(baseUrl string, url string) string {
 	return path.Join(path.Dir(baseUrl), url)
+}
+
+// GetMapChild try to find the given keys
+func GetMapChild(keys []string, m map[string]interface{}) (interface{}, error) {
+	var innerMap map[string]interface{}
+	var v interface{}
+	var has, ok bool
+	for i := range keys {
+		if innerMap == nil {
+			innerMap = m
+		} else {
+			innerMap, ok = v.(map[string]interface{})
+			if !ok {
+				return nil, errors.New("key not found " + keys[i])
+			}
+		}
+		v, has = innerMap[keys[i]]
+		if !has {
+			return nil, errors.New("key not found " + keys[i])
+		}
+	}
+	return v, nil
 }

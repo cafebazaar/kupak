@@ -2,6 +2,7 @@ package kupak
 
 import (
 	"errors"
+
 	"gopkg.in/yaml.v2"
 )
 
