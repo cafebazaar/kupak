@@ -2,3 +2,4 @@ package: kupak
 import:
 - package: github.com/codegangsta/cli
 - package: github.com/ghodss/yaml
+- package: github.com/nu7hatch/gouuid

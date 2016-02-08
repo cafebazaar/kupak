@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"kupak"
 	"os"
 )
@@ -11,13 +10,19 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	for i := range repo.Index {
-		fmt.Println(repo.Index[i].String())
-	}
 
 	pak, err := repo.Pak("redis", "1.0")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(pak.Name)
+
+	manager, err := kupak.NewManager()
+	if err != nil {
+		panic(err)
+	}
+
+	err = manager.Install(pak, "default", map[string]interface{}{})
+	if err != nil {
+		panic(err)
+	}
 }

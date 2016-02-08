@@ -52,3 +52,17 @@ func GetMapChild(keys []string, m map[string]interface{}) (interface{}, error) {
 	}
 	return v, nil
 }
+
+func MergeStringMaps(a map[string]string, b map[string]string) map[string]string {
+	if a == nil {
+		a = make(map[string]string)
+	}
+	out := make(map[string]string)
+	for k, v := range a {
+		out[k] = v
+	}
+	for k, v := range b {
+		out[k] = v
+	}
+	return out
+}
