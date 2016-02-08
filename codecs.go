@@ -1,21 +1,35 @@
 package kupak
 
 import (
-	//	"k8s.io/kubernetes/pkg/api"
 	"errors"
+	"time"
 
 	"github.com/ghodss/yaml"
-	"k8s.io/kubernetes/pkg/api/unversioned"
-	"k8s.io/kubernetes/pkg/api/v1"
 )
 
 type Object struct {
 	data []byte
 }
 
+type MetadataMD struct {
+	Name                       string            `json:"name,omitempty"`
+	GenerateName               string            `json:"generateName,omitempty"`
+	Namespace                  string            `json:"namespace,omitempty"`
+	SelfLink                   string            `json:"selfLink,omitempty"`
+	UID                        string            `json:"uid,omitempty"`
+	ResourceVersion            string            `json:"resourceVersion,omitempty"`
+	Generation                 int64             `json:"generation,omitempty"`
+	CreationTimestamp          time.Time         `json:"creationTimestamp,omitempty"`
+	DeletionTimestamp          *time.Time        `json:"deletionTimestamp,omitempty"`
+	DeletionGracePeriodSeconds *int64            `json:"deletionGracePeriodSeconds,omitempty"`
+	Labels                     map[string]string `json:"labels,omitempty"`
+	Annotations                map[string]string `json:"annotations,omitempty"`
+}
+
 type Metadata struct {
-	unversioned.TypeMeta `json:",inline"`
-	v1.ObjectMeta        `json:"metadata,omitempty"`
+	Kind       string `json:"kind,omitempty"`
+	APIVersion string `json:"apiVersion,omitempty"`
+	MetadataMD `json:"metadata,omitempty"`
 }
 
 type templateMetadata struct {
@@ -45,7 +59,7 @@ func (o *Object) SetLabels(labels map[string]string) error {
 	if err := yaml.Unmarshal(o.data, &m); err != nil {
 		return err
 	}
-	v, err := GetMapChild([]string{"metadata"}, m)
+	v, err := getMapChild([]string{"metadata"}, m)
 	if err != nil {
 		return err
 	}
@@ -66,7 +80,7 @@ func (o *Object) SetAnnotations(annotations map[string]string) error {
 	if err := yaml.Unmarshal(o.data, &m); err != nil {
 		return err
 	}
-	v, err := GetMapChild([]string{"metadata"}, m)
+	v, err := getMapChild([]string{"metadata"}, m)
 	if err != nil {
 		return err
 	}
@@ -95,7 +109,7 @@ func (o *Object) SetTemplateLabels(labels map[string]string) error {
 	if err := yaml.Unmarshal(o.data, &m); err != nil {
 		return err
 	}
-	v, err := GetMapChild([]string{"spec", "template", "metadata"}, m)
+	v, err := getMapChild([]string{"spec", "template", "metadata"}, m)
 	if err != nil {
 		return err
 	}
@@ -116,7 +130,7 @@ func (o *Object) SetTemplateAnnotations(Annotations map[string]string) error {
 	if err := yaml.Unmarshal(o.data, &m); err != nil {
 		return err
 	}
-	v, err := GetMapChild([]string{"spec", "template", "metadata"}, m)
+	v, err := getMapChild([]string{"spec", "template", "metadata"}, m)
 	if err != nil {
 		return err
 	}
