@@ -3,7 +3,12 @@ maintainer: Ali Alaee::ali.alaee@gmail.com
 
 packages:
   - name: redis
-    url: paks/redis-1.0/redis.yaml
+    url: paks/redis-1.0/pak.yaml
+    version: 1.0
+    description: |
+      this is a description
+  - name: pg
+    url: paks/pg-1.0/pak.yaml
     version: 1.0
     description: |
       this is a description
