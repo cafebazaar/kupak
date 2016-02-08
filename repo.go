@@ -28,8 +28,8 @@ func RepoFromBytes(data []byte) (*Repo, error) {
 	return &repo, nil
 }
 
-func RepoFromUrl(url string) (*Repo, error) {
-	data, err := fetchUrl(url)
+func RepoFromURL(url string) (*Repo, error) {
+	data, err := fetchURL(url)
 	if err != nil {
 		return nil, err
 	}
@@ -62,8 +62,8 @@ func (r *Repo) HasVersion(pak string, version string) bool {
 func (r *Repo) Pak(pak string, version string) (*Pak, error) {
 	for i := range r.Index {
 		if r.Index[i].Name == pak && r.Index[i].Version == version {
-			url := joinUrl(r.Url, r.Index[i].URL)
-			pak, err := PakFromUrl(url)
+			url := joinURL(r.Url, r.Index[i].URL)
+			pak, err := PakFromURL(url)
 			if err != nil {
 				return nil, err
 			}

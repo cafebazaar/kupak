@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func fetchUrl(url string) ([]byte, error) {
+func fetchURL(url string) ([]byte, error) {
 	if strings.HasPrefix(strings.ToLower(url), "http://") ||
 		strings.HasPrefix(strings.ToLower(url), "https://") {
 		c := &http.Client{}
@@ -22,17 +22,15 @@ func fetchUrl(url string) ([]byte, error) {
 			return nil, err
 		}
 		return data, nil
-	} else {
-		return ioutil.ReadFile(url)
 	}
+	return ioutil.ReadFile(url)
 }
 
-func joinUrl(baseUrl string, url string) string {
+func joinURL(baseUrl string, url string) string {
 	return path.Join(path.Dir(baseUrl), url)
 }
 
-// GetMapChild try to find the given keys
-func GetMapChild(keys []string, m map[string]interface{}) (interface{}, error) {
+func getMapChild(keys []string, m map[string]interface{}) (interface{}, error) {
 	var innerMap map[string]interface{}
 	var v interface{}
 	var has, ok bool
@@ -53,7 +51,7 @@ func GetMapChild(keys []string, m map[string]interface{}) (interface{}, error) {
 	return v, nil
 }
 
-func MergeStringMaps(a map[string]string, b map[string]string) map[string]string {
+func mergeStringMaps(a map[string]string, b map[string]string) map[string]string {
 	if a == nil {
 		a = make(map[string]string)
 	}

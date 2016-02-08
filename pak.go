@@ -31,8 +31,8 @@ func validateProperties(properties []Property) error {
 func (p *Pak) fetchAndMakeTemplates(baseUrl string) error {
 	p.Templates = make([]*template.Template, len(p.ResourceUrls))
 	for i := range p.ResourceUrls {
-		url := joinUrl(baseUrl, p.ResourceUrls[i])
-		data, err := fetchUrl(url)
+		url := joinURL(baseUrl, p.ResourceUrls[i])
+		data, err := fetchURL(url)
 		if err != nil {
 			return err
 		}
@@ -73,8 +73,8 @@ func (p *Pak) valuesWithDefaults(values map[string]interface{}) error {
 	return nil
 }
 
-func PakFromUrl(url string) (*Pak, error) {
-	data, err := fetchUrl(url)
+func PakFromURL(url string) (*Pak, error) {
+	data, err := fetchURL(url)
 	if err != nil {
 		return nil, err
 	}

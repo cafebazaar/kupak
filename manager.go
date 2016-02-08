@@ -15,12 +15,12 @@ const (
 )
 
 type InstalledPak struct {
-	Group      string
-	Namespace  string
-	PakUrl     string
-	Properties map[string]string
-	Objects    []interface{}
-	Status     Status
+	Group            string
+	Namespace        string
+	PakURL           string
+	PropertiesValues map[string]interface{}
+	Objects          []interface{}
+	Status           Status
 }
 
 type Manager struct {
@@ -66,14 +66,14 @@ func (m *Manager) Install(pak *Pak, namespace string, properties map[string]inte
 		if err != nil {
 			return err
 		}
-		mergedLabels := MergeStringMaps(md.Labels, labels)
+		mergedLabels := mergeStringMaps(md.Labels, labels)
 		err = object.SetLabels(mergedLabels)
 		if err != nil {
 			return err
 		}
 		// TODO validation for replication controller - do not ignore
 		if templateMd, err := object.TemplateMetadata(); err == nil {
-			mergedLabels := MergeStringMaps(templateMd.Labels, labels)
+			mergedLabels := mergeStringMaps(templateMd.Labels, labels)
 			object.SetTemplateLabels(mergedLabels)
 		}
 		bytes, _ := object.Bytes()
