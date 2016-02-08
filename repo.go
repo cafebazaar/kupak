@@ -37,7 +37,7 @@ func RepoFromURL(url string) (*Repo, error) {
 	if err != nil {
 		return nil, err
 	}
-	repo.Url = url
+	repo.URL = url
 	return repo, nil
 }
 
@@ -62,7 +62,7 @@ func (r *Repo) HasVersion(pak string, version string) bool {
 func (r *Repo) Pak(pak string, version string) (*Pak, error) {
 	for i := range r.Index {
 		if r.Index[i].Name == pak && r.Index[i].Version == version {
-			url := joinURL(r.Url, r.Index[i].URL)
+			url := joinURL(r.URL, r.Index[i].URL)
 			pak, err := PakFromURL(url)
 			if err != nil {
 				return nil, err

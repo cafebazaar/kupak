@@ -26,8 +26,8 @@ func fetchURL(url string) ([]byte, error) {
 	return ioutil.ReadFile(url)
 }
 
-func joinURL(baseUrl string, url string) string {
-	return path.Join(path.Dir(baseUrl), url)
+func joinURL(baseURL string, url string) string {
+	return path.Join(path.Dir(baseURL), url)
 }
 
 func getMapChild(keys []string, m map[string]interface{}) (interface{}, error) {

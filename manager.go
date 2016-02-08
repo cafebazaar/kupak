@@ -6,23 +6,6 @@ import (
 	"github.com/nu7hatch/gouuid"
 )
 
-type Status int
-
-const (
-	StatusError Status = iota
-	StatusRunning
-	StatusDeleting
-)
-
-type InstalledPak struct {
-	Group            string
-	Namespace        string
-	PakURL           string
-	PropertiesValues map[string]interface{}
-	Objects          []interface{}
-	Status           Status
-}
-
 type Manager struct {
 }
 
@@ -74,7 +57,10 @@ func (m *Manager) Install(pak *Pak, namespace string, properties map[string]inte
 		// TODO validation for replication controller - do not ignore
 		if templateMd, err := object.TemplateMetadata(); err == nil {
 			mergedLabels := mergeStringMaps(templateMd.Labels, labels)
-			object.SetTemplateLabels(mergedLabels)
+			err = object.SetTemplateLabels(mergedLabels)
+			if err != nil {
+				return err
+			}
 		}
 		bytes, _ := object.Bytes()
 		fmt.Println(string(bytes))
