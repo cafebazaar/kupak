@@ -21,7 +21,7 @@ func (p *PakInfo) String() string {
 type Pak struct {
 	PakInfo      `yaml:",inline"`
 	Properties   []Property `yaml:"properties,omitempty"`
-	ResourceUrls []string   `yaml:"resources"`
+	ResourceURLs []string   `yaml:"resources"`
 
 	// Populated from resources
 	Templates []*template.Template `yaml:""`
@@ -42,16 +42,17 @@ type Repo struct {
 	Name        string     `yaml:"name"`
 	Description string     `yaml:"description,omitempty"`
 	Maintainer  string     `yaml:"maintainer,omitempty"`
-	Index       []*PakInfo `yaml:"packages"`
+	Paks        []*PakInfo `yaml:"packages"`
 }
 
 // Status represents current state of an installed pak
-type Status int
+type Status string
 
+// Statuses represents current state of a installed pak
 const (
-	StatusError Status = iota
-	StatusRunning
-	StatusDeleting
+	StatusError    Status = "StatusError"
+	StatusRunning         = "StatusRunning"
+	StatusDeleting        = "StatusDeleting"
 )
 
 // InstalledPak Represents an installed pak with a unique Group

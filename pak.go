@@ -28,15 +28,15 @@ func validateProperties(properties []Property) error {
 	return nil
 }
 
-func (p *Pak) fetchAndMakeTemplates(baseUrl string) error {
-	p.Templates = make([]*template.Template, len(p.ResourceUrls))
-	for i := range p.ResourceUrls {
-		url := joinURL(baseUrl, p.ResourceUrls[i])
+func (p *Pak) fetchAndMakeTemplates(baseURL string) error {
+	p.Templates = make([]*template.Template, len(p.ResourceURLs))
+	for i := range p.ResourceURLs {
+		url := joinURL(baseURL, p.ResourceURLs[i])
 		data, err := fetchURL(url)
 		if err != nil {
 			return err
 		}
-		t := template.New(p.ResourceUrls[i])
+		t := template.New(p.ResourceURLs[i])
 		t.Delims("$(", ")")
 		resourceTemplate, err := t.Parse(string(data))
 		if err != nil {
@@ -47,6 +47,7 @@ func (p *Pak) fetchAndMakeTemplates(baseUrl string) error {
 	return nil
 }
 
+// ExecuteTemplates generate resources of a pak with given values
 func (p *Pak) ExecuteTemplates(values map[string]interface{}) ([][]byte, error) {
 	// TODO validate values
 	// TODO copy values
@@ -73,6 +74,7 @@ func (p *Pak) valuesWithDefaults(values map[string]interface{}) error {
 	return nil
 }
 
+// PakFromURL reads a pak.yaml file and fetches all the resources files
 func PakFromURL(url string) (*Pak, error) {
 	data, err := fetchURL(url)
 	if err != nil {
