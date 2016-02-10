@@ -2,15 +2,17 @@ package kupak
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/nu7hatch/gouuid"
 )
 
 type Manager struct {
+	kubectl Kubectl
 }
 
-func NewManager() (*Manager, error) {
-	return &Manager{}, nil
+func NewManager(kubectl Kubectl) (*Manager, error) {
+	return &Manager{kubectl: kubectl}, nil
 }
 
 func (m *Manager) Installed(namespace string) ([]*InstalledPak, error) {
@@ -31,13 +33,14 @@ func (m *Manager) Install(pak *Pak, namespace string, properties map[string]inte
 	if err != nil {
 		return err
 	}
-	group, err := uuid.NewV4()
+	pakID, err := uuid.NewV4()
 	if err != nil {
 		return err
 	}
 	labels := map[string]string{
-		"kupak-group":   group.String(),
-		"kupak-pak-url": pak.URL,
+		"kupak-pak-id": pakID.String(),
+		// TODO pak url should be full address with .
+		"kupak-pak-url": strings.Replace(pak.URL, "/", "-", -1),
 	}
 	var objects []*Object
 	for i := range rawObjects {
@@ -62,10 +65,19 @@ func (m *Manager) Install(pak *Pak, namespace string, properties map[string]inte
 				return err
 			}
 		}
-		bytes, _ := object.Bytes()
-		fmt.Println(string(bytes))
-		fmt.Println("----\n----")
 		objects = append(objects, object)
+	}
+
+	// install
+	for i := range objects {
+		data, _ := objects[i].Bytes()
+		fmt.Println(string(data))
+		err := m.kubectl.Create(namespace, objects[i])
+		if err != nil {
+			// TODO XXXXXXXX rollback
+			return err
+		}
+		fmt.Println("-----")
 	}
 	return nil
 }

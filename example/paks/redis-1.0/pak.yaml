@@ -9,6 +9,9 @@ resources:
   - svc.yaml
 
 properties:
+  - name: name
+    description: Name of the instance
+    type: string
   - name: port
     description: Listening port for redis
     type: int

@@ -51,6 +51,15 @@ func (p *Pak) fetchAndMakeTemplates(baseURL string) error {
 func (p *Pak) ExecuteTemplates(values map[string]interface{}) ([][]byte, error) {
 	// TODO validate values
 	// TODO copy values
+
+	// check all required values are given
+	for i := range p.Properties {
+		_, has := values[p.Properties[i].Name]
+		if p.Properties[i].Default == nil && !has {
+			return nil, errors.New("required property '" + p.Properties[i].Name + "' is not specified")
+		}
+	}
+
 	outputs := make([][]byte, len(p.Templates))
 	for i := range p.Templates {
 		buffer := &bytes.Buffer{}
@@ -90,6 +99,5 @@ func PakFromURL(url string) (*Pak, error) {
 	if err := pak.fetchAndMakeTemplates(url); err != nil {
 		return nil, err
 	}
-	println(pak.Templates[0])
 	return &pak, nil
 }

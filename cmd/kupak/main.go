@@ -2,14 +2,29 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"kupak"
 	"os"
 	"strings"
 
 	"github.com/codegangsta/cli"
+	"github.com/ghodss/yaml"
 )
 
+var manager *kupak.Manager
+
 func main() {
+	kubectl, err := kupak.NewKubectlRunner()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(-1)
+	}
+	manager, err = kupak.NewManager(kubectl)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(-1)
+	}
+
 	app := cli.NewApp()
 	app.Name = "kupak"
 	app.Usage = "Kubernetes Package Manager"
@@ -24,7 +39,7 @@ func main() {
 		{
 			Name:    "install",
 			Aliases: []string{"i"},
-			Usage:   "install the specified pak (full url or relative to --repo)",
+			Usage:   "install the specified pak (full url or a plain name that exists in specified repo)",
 			Action:  install,
 		},
 	}
@@ -35,22 +50,50 @@ func main() {
 			Usage:  "specify repo url",
 			EnvVar: "KUPAK_REPO",
 		},
+		cli.StringFlag{
+			Name:   "namespace",
+			Value:  "default",
+			Usage:  "namespace",
+			EnvVar: "KUPAK_NAMESPACE",
+		},
 	}
 	app.Run(os.Args)
 }
 
 func install(c *cli.Context) {
-	manager, err := kupak.NewManager()
+	pakURL := c.Args().First()
+	valuesFile := c.Args().Get(1)
+	if pakURL == "" {
+		fmt.Fprintln(os.Stderr, "please specify the pak")
+		os.Exit(-1)
+	}
+
+	pak, err := kupak.PakFromURL(pakURL)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(-1)
 	}
-	pak, err := kupak.PakFromURL("src/kupak/example/paks/redis-1.0/pak.yaml")
+
+	// read value file
+	var valuesData []byte
+	if valuesFile == "" {
+		valuesData, err = ioutil.ReadAll(os.Stdin)
+	} else {
+		valuesData, err = ioutil.ReadFile(valuesFile)
+	}
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(-1)
 	}
-	err = manager.Install(pak, "default", map[string]interface{}{})
+
+	values := make(map[string]interface{})
+	err = yaml.Unmarshal(valuesData, &values)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(-1)
+	}
+
+	err = manager.Install(pak, c.GlobalString("namespace"), values)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(-1)
