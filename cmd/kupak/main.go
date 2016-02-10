@@ -64,10 +64,10 @@ func list(c *cli.Context) {
 		os.Exit(-1)
 	}
 	fmt.Println("List of available Paks:")
-	for i := range repo.Index {
-		fmt.Println("- Name:", repo.Index[i].Name)
-		fmt.Println("  Version:", repo.Index[i].Version)
-		fmt.Println("  Tags:", "["+strings.Join(repo.Index[i].Tags, ", ")+"]")
+	for i := range repo.Paks {
+		fmt.Println("- Name:", repo.Paks[i].Name)
+		fmt.Println("  Version:", repo.Paks[i].Version)
+		fmt.Println("  Tags:", "["+strings.Join(repo.Paks[i].Tags, ", ")+"]")
 		fmt.Println()
 	}
 }
