@@ -31,10 +31,10 @@ func main() {
 	app.Version = "0.1"
 	app.Commands = []cli.Command{
 		{
-			Name:    "list",
-			Aliases: []string{"l"},
-			Usage:   "list packages of specified repo",
-			Action:  list,
+			Name:    "paks",
+			Aliases: []string{"p"},
+			Usage:   "list all available paks of specified repo",
+			Action:  paks,
 		},
 		{
 			Name:    "install",
@@ -43,10 +43,10 @@ func main() {
 			Action:  install,
 		},
 		{
-			Name:    "deployed",
-			Aliases: []string{"d"},
+			Name:    "list",
+			Aliases: []string{"l"},
 			Usage:   "list all installed packages",
-			Action:  deployed,
+			Action:  list,
 		},
 	}
 	app.Flags = []cli.Flag{
@@ -106,7 +106,7 @@ func install(c *cli.Context) {
 	}
 }
 
-func list(c *cli.Context) {
+func paks(c *cli.Context) {
 	repo, err := kupak.RepoFromURL(c.GlobalString("repo"))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -121,7 +121,7 @@ func list(c *cli.Context) {
 	}
 }
 
-func deployed(c *cli.Context) {
+func list(c *cli.Context) {
 	paks, err := manager.Installed(c.GlobalString("namespace"))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
