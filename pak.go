@@ -2,7 +2,10 @@ package kupak
 
 import (
 	"bytes"
+	"crypto/md5"
 	"errors"
+	"fmt"
+	"io"
 	"text/template"
 
 	"gopkg.in/yaml.v2"
@@ -26,6 +29,12 @@ func validateProperties(properties []Property) error {
 		}
 	}
 	return nil
+}
+
+func (p *Pak) ID() string {
+	md5er := md5.New()
+	io.WriteString(md5er, p.URL)
+	return fmt.Sprintf("%x", md5er.Sum(nil))
 }
 
 func (p *Pak) fetchAndMakeTemplates(baseURL string) error {

@@ -45,22 +45,14 @@ type Repo struct {
 	Paks        []*PakInfo `yaml:"packages"`
 }
 
-// Status represents current state of an installed pak
-type Status string
-
-// Statuses represents current state of a installed pak
-const (
-	StatusError    Status = "StatusError"
-	StatusRunning         = "StatusRunning"
-	StatusDeleting        = "StatusDeleting"
-)
-
 // InstalledPak Represents an installed pak with a unique Group
 type InstalledPak struct {
-	Group            string
+	GroupID          string
 	Namespace        string
 	PakURL           string
 	PropertiesValues map[string]interface{}
 	Objects          []interface{}
-	Status           Status
+
+	// Map of pod's name and its status
+	Statuses map[string]*PodStatus
 }

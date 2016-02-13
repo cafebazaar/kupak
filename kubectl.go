@@ -8,7 +8,7 @@ import (
 	"github.com/ghodss/yaml"
 )
 
-// TODO refactor err handling and make a distinct error type
+// TODO refactor err handling and make distinct error types
 
 const (
 	kubepath = "/home/lord/go/kubectl"
@@ -19,10 +19,15 @@ type kubeList struct {
 }
 
 type Kubectl interface {
+	// Get returns Objects with given selector
 	Get(namespace string, type_ string, selector string) ([]*Object, error)
+
+	// Create creates a kubernetes objects
 	Create(namespace string, o *Object) error
 }
 
+// KubectlRunner is a real implementation of Kubectl interface which uses kubectl
+// executable
 type KubectlRunner struct{}
 
 func NewKubectlRunner() (*KubectlRunner, error) {

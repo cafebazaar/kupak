@@ -3,29 +3,80 @@ package kupak
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/nu7hatch/gouuid"
 )
 
+// Manager manages installation and deploying pak to a kubernetes cluster
 type Manager struct {
 	kubectl Kubectl
 }
 
+// NewManager returns a Manager
 func NewManager(kubectl Kubectl) (*Manager, error) {
 	return &Manager{kubectl: kubectl}, nil
 }
 
+// Installed returns all installed paks in given namespace
 func (m *Manager) Installed(namespace string) ([]*InstalledPak, error) {
-	return nil, nil
+	objects, err := m.kubectl.Get(namespace, "all", "")
+	if err != nil {
+		return nil, err
+	}
+
+	// group all paks
+	groups := make(map[string][]*Object)
+	for i := range objects {
+		md, err := objects[i].Metadata()
+		if err != nil {
+			return nil, err
+		}
+		groupID, has := md.Labels["kp-group-id"]
+		if has {
+			groups[groupID] = append(groups[groupID], objects[i])
+		}
+	}
+
+	var installedPaks []*InstalledPak
+	for k, v := range groups {
+		// create InstalledPak objects from group
+		installedPak := &InstalledPak{}
+		installedPak.Statuses = make(map[string]*PodStatus)
+		installedPak.GroupID = k
+		for i := range v {
+			md, err := v[i].Metadata()
+			if err != nil {
+				return nil, err
+			}
+
+			// find url
+			if url, has := md.Annotations["kp-pak-url"]; installedPak.PakURL == "" && has {
+				installedPak.PakURL = url
+			}
+
+			// find namespace
+			if installedPak.Namespace == "" {
+				installedPak.Namespace = md.Namespace
+			}
+
+			// extracting all pod statuses
+			if strings.ToLower(md.Kind) == "pod" {
+				status, err := v[i].Status()
+				if err != nil {
+					return nil, err
+				}
+				installedPak.Statuses[md.Name] = status
+			}
+		}
+		installedPaks = append(installedPaks, installedPak)
+	}
+	return installedPaks, nil
 }
 
-func (m *Manager) Instances(namespace string, pak *Pak) ([]*InstalledPak, error) {
-	return nil, nil
-}
-
-func (m *Manager) Status(namespace string, instance string) (*InstalledPak, error) {
-	return nil, nil
-}
+// TODO
+// func (m *Manager) Instances(namespace string, pak *Pak) ([]*InstalledPak, error)
+// func (m *Manager) Status(namespace string, instance string) (*InstalledPak, error)
 
 // Install a pak with given name
 func (m *Manager) Install(pak *Pak, namespace string, properties map[string]interface{}) error {
@@ -33,35 +84,44 @@ func (m *Manager) Install(pak *Pak, namespace string, properties map[string]inte
 	if err != nil {
 		return err
 	}
-	pakID, err := uuid.NewV4()
+
+	groupID, err := uuid.NewV4()
 	if err != nil {
 		return err
 	}
 	labels := map[string]string{
-		"kupak-pak-id": pakID.String(),
-		// TODO pak url should be full address with .
-		"kupak-pak-url": strings.Replace(pak.URL, "/", "-", -1),
+		"kp-group-id": groupID.String(),
+		"kp-pak-id":   pak.ID(),
 	}
+	annotations := map[string]string{
+		"kp-pak-url":      pak.URL,
+		"kp-created-time": time.Now().String(),
+	}
+
 	var objects []*Object
 	for i := range rawObjects {
 		object, err := NewObject(rawObjects[i])
 		if err != nil {
 			return err
 		}
+
 		md, err := object.Metadata()
 		if err != nil {
 			return err
 		}
+
 		mergedLabels := mergeStringMaps(md.Labels, labels)
-		err = object.SetLabels(mergedLabels)
-		if err != nil {
+		if err = object.SetLabels(mergedLabels); err != nil {
 			return err
 		}
+		if err = object.SetAnnotations(annotations); err != nil {
+			return err
+		}
+
 		// TODO validation for replication controller - do not ignore
 		if templateMd, err := object.TemplateMetadata(); err == nil {
 			mergedLabels := mergeStringMaps(templateMd.Labels, labels)
-			err = object.SetTemplateLabels(mergedLabels)
-			if err != nil {
+			if err = object.SetTemplateLabels(mergedLabels); err != nil {
 				return err
 			}
 		}

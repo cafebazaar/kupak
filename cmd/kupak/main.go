@@ -42,6 +42,12 @@ func main() {
 			Usage:   "install the specified pak (full url or a plain name that exists in specified repo)",
 			Action:  install,
 		},
+		{
+			Name:    "deployed",
+			Aliases: []string{"d"},
+			Usage:   "list all installed packages",
+			Action:  deployed,
+		},
 	}
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -112,5 +118,24 @@ func list(c *cli.Context) {
 		fmt.Println("  Version:", repo.Paks[i].Version)
 		fmt.Println("  Tags:", "["+strings.Join(repo.Paks[i].Tags, ", ")+"]")
 		fmt.Println()
+	}
+}
+
+func deployed(c *cli.Context) {
+	paks, err := manager.Installed(c.GlobalString("namespace"))
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(-1)
+	}
+
+	for i := range paks {
+		fmt.Printf("Pak URL:  %s\n", paks[i].PakURL)
+		fmt.Printf("Group ID: %s\n", paks[i].GroupID)
+		fmt.Printf("Objects:\n")
+		for j := range paks[i].Objects {
+			obj := paks[i].Objects[j]
+			md, _ := obj.Metadata()
+			fmt.Printf("\tName: %s\n", md.Name)
+		}
 	}
 }
