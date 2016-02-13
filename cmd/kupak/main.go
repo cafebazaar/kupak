@@ -135,7 +135,19 @@ func deployed(c *cli.Context) {
 		for j := range paks[i].Objects {
 			obj := paks[i].Objects[j]
 			md, _ := obj.Metadata()
-			fmt.Printf("\tName: %s\n", md.Name)
+			fmt.Printf("\t(%s) %s\n", md.Kind, md.Name)
+			if md.Kind == "Pod" {
+				status, _ := obj.Status()
+				fmt.Printf("\t  State:     %s\n", status.Phase)
+				fmt.Printf("\t  Pod IP:    %s\n", status.PodIP)
+				if status.Reason != "" {
+					fmt.Printf("\t  Reason:  %s\n", status.Reason)
+				}
+				if status.Message != "" {
+					fmt.Printf("\t  Message: %s\n", status.Message)
+				}
+			}
 		}
+		fmt.Println()
 	}
 }

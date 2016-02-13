@@ -51,7 +51,7 @@ type InstalledPak struct {
 	Namespace        string
 	PakURL           string
 	PropertiesValues map[string]interface{}
-	Objects          []interface{}
+	Objects          []*Object
 
 	// Map of pod's name and its status
 	Statuses map[string]*PodStatus

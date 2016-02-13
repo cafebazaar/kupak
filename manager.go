@@ -44,6 +44,7 @@ func (m *Manager) Installed(namespace string) ([]*InstalledPak, error) {
 		installedPak := &InstalledPak{}
 		installedPak.Statuses = make(map[string]*PodStatus)
 		installedPak.GroupID = k
+		installedPak.Objects = v
 		for i := range v {
 			md, err := v[i].Metadata()
 			if err != nil {
