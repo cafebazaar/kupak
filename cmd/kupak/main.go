@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"kupak"
 	"os"
 	"strings"
+
+	"git.cafebazaar.ir/alaee/kupak"
 
 	"github.com/codegangsta/cli"
 	"github.com/ghodss/yaml"
