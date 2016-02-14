@@ -24,7 +24,7 @@ type Pak struct {
 	ResourceURLs []string   `json:"resources"`
 
 	// Populated from resources
-	Templates []*template.Template `json:""`
+	Templates []*template.Template `json:"-"`
 }
 
 // Property contains definition of every property that required for generating

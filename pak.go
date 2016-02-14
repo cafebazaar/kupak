@@ -31,6 +31,7 @@ func validateProperties(properties []Property) error {
 	return nil
 }
 
+// ID returns unique id for this pak
 func (p *Pak) ID() string {
 	md5er := md5.New()
 	io.WriteString(md5er, p.URL)
