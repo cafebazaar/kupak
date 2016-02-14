@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"path"
 	"strings"
 )
@@ -26,8 +27,14 @@ func fetchURL(url string) ([]byte, error) {
 	return ioutil.ReadFile(url)
 }
 
-func joinURL(baseURL string, url string) string {
-	return path.Join(path.Dir(baseURL), url)
+func joinURL(baseURL string, secondURL string) string {
+	// only combine path part if baseURL is url not a local file and it make sense
+	base, err := url.Parse(baseURL)
+	if err == nil {
+		base.Path = path.Join(path.Dir(base.Path), secondURL)
+		return base.String()
+	}
+	return path.Join(path.Dir(baseURL), secondURL)
 }
 
 func getMapChild(keys []string, m map[string]interface{}) (interface{}, error) {

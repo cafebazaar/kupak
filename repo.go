@@ -2,6 +2,7 @@ package kupak
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/ghodss/yaml"
 )
@@ -30,8 +31,23 @@ func RepoFromBytes(data []byte) (*Repo, error) {
 }
 
 // RepoFromURL fetches index file specified by url and returns a *Repo
-func RepoFromURL(url string) (*Repo, error) {
-	data, err := fetchURL(url)
+func RepoFromURL(repoURL string) (*Repo, error) {
+	// check if index.json or index.yaml is specified in url, if it's not add
+	// both one by one and check for it existence
+	if !strings.HasSuffix(repoURL, ".json") && !strings.HasSuffix(repoURL, ".yaml") {
+		// check if .yaml exists
+		yamlURL := joinURL(repoURL, "index.yaml")
+		repo, err := RepoFromURL(yamlURL)
+		if err == nil {
+			return repo, nil
+		}
+
+		// check if .json
+		jsonURL := joinURL(repoURL, "index.json")
+		return RepoFromURL(jsonURL)
+	}
+
+	data, err := fetchURL(repoURL)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +55,7 @@ func RepoFromURL(url string) (*Repo, error) {
 	if err != nil {
 		return nil, err
 	}
-	repo.URL = url
+	repo.URL = repoURL
 	return repo, nil
 }
 
