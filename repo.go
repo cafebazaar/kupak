@@ -3,7 +3,7 @@ package kupak
 import (
 	"errors"
 
-	"gopkg.in/yaml.v2"
+	"github.com/ghodss/yaml"
 )
 
 // RepoFromBytes make *Repo from data

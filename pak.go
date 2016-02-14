@@ -8,7 +8,7 @@ import (
 	"io"
 	"text/template"
 
-	"gopkg.in/yaml.v2"
+	"github.com/ghodss/yaml"
 )
 
 func validateProperties(properties []Property) error {

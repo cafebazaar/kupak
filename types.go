@@ -5,11 +5,11 @@ import "text/template"
 // PakInfo contains basic information about the pak that doesn't need
 // to be fetched
 type PakInfo struct {
-	Name        string   `yaml:"name"`
-	Version     string   `yaml:"version"`
-	URL         string   `yaml:"url"`
-	Description string   `yaml:"description,omitempty"`
-	Tags        []string `yaml:"tags,omitempty"`
+	Name        string   `json:"name"`
+	Version     string   `json:"version"`
+	URL         string   `json:"url"`
+	Description string   `json:"description,omitempty"`
+	Tags        []string `json:"tags,omitempty"`
 }
 
 func (p *PakInfo) String() string {
@@ -19,30 +19,30 @@ func (p *PakInfo) String() string {
 
 // Pak contains all the data and information that needed for installing it
 type Pak struct {
-	PakInfo      `yaml:",inline"`
-	Properties   []Property `yaml:"properties,omitempty"`
-	ResourceURLs []string   `yaml:"resources"`
+	PakInfo      `json:",inline"`
+	Properties   []Property `json:"properties,omitempty"`
+	ResourceURLs []string   `json:"resources"`
 
 	// Populated from resources
-	Templates []*template.Template `yaml:""`
+	Templates []*template.Template `json:""`
 }
 
 // Property contains definition of every property that required for generating
 // pak templates
 type Property struct {
-	Name        string      `yaml:"name"`
-	Type        string      `yaml:"type"`
-	Description string      `yaml:"description,omitempty"`
-	Default     interface{} `yaml:"default,omitempty"`
+	Name        string      `json:"name"`
+	Type        string      `json:"type"`
+	Description string      `json:"description,omitempty"`
+	Default     interface{} `json:"default,omitempty"`
 }
 
 // Repo represents an index file that contains list of paks
 type Repo struct {
-	URL         string     `yaml:""`
-	Name        string     `yaml:"name"`
-	Description string     `yaml:"description,omitempty"`
-	Maintainer  string     `yaml:"maintainer,omitempty"`
-	Paks        []*PakInfo `yaml:"packages"`
+	URL         string     `json:""`
+	Name        string     `json:"name"`
+	Description string     `json:"description,omitempty"`
+	Maintainer  string     `json:"maintainer,omitempty"`
+	Paks        []*PakInfo `json:"packages"`
 }
 
 // InstalledPak Represents an installed pak with a unique Group
