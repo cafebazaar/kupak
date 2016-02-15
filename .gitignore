@@ -13,5 +13,6 @@ _test
 .DS_Store
 *.sublime-workspace
 
+/kupak
 glide.lock
 vendor

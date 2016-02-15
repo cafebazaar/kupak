@@ -11,7 +11,7 @@ import (
 // TODO refactor err handling and make distinct error types
 
 const (
-	kubepath = "/home/lord/go/kubectl"
+	kubepath = "kubectl"
 )
 
 type kubeList struct {

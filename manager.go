@@ -136,7 +136,7 @@ func (m *Manager) Install(pak *Pak, namespace string, properties map[string]inte
 		err := m.kubectl.Create(namespace, objects[i])
 		if err != nil {
 			// TODO XXXXXXXX rollback
-			return groupID.String(), err
+			return groupID.String(), fmt.Errorf("failed calling kubectl.Create: %v", err)
 		}
 		fmt.Println("-----")
 	}
