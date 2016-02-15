@@ -79,16 +79,16 @@ func (m *Manager) Installed(namespace string) ([]*InstalledPak, error) {
 // func (m *Manager) Instances(namespace string, pak *Pak) ([]*InstalledPak, error)
 // func (m *Manager) Status(namespace string, instance string) (*InstalledPak, error)
 
-// Install a pak with given name
-func (m *Manager) Install(pak *Pak, namespace string, properties map[string]interface{}) error {
+// Install a pak with given name and returns its groupID
+func (m *Manager) Install(pak *Pak, namespace string, properties map[string]interface{}) (string, error) {
 	rawObjects, err := pak.ExecuteTemplates(properties)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	groupID, err := uuid.NewV4()
 	if err != nil {
-		return err
+		return "", err
 	}
 	labels := map[string]string{
 		"kp-group-id": groupID.String(),
@@ -103,27 +103,27 @@ func (m *Manager) Install(pak *Pak, namespace string, properties map[string]inte
 	for i := range rawObjects {
 		object, err := NewObject(rawObjects[i])
 		if err != nil {
-			return err
+			return "", err
 		}
 
 		md, err := object.Metadata()
 		if err != nil {
-			return err
+			return "", err
 		}
 
 		mergedLabels := mergeStringMaps(md.Labels, labels)
 		if err = object.SetLabels(mergedLabels); err != nil {
-			return err
+			return "", err
 		}
 		if err = object.SetAnnotations(annotations); err != nil {
-			return err
+			return "", err
 		}
 
 		// TODO validation for replication controller - do not ignore
 		if templateMd, err := object.TemplateMetadata(); err == nil {
 			mergedLabels := mergeStringMaps(templateMd.Labels, labels)
 			if err = object.SetTemplateLabels(mergedLabels); err != nil {
-				return err
+				return "", err
 			}
 		}
 		objects = append(objects, object)
@@ -136,11 +136,11 @@ func (m *Manager) Install(pak *Pak, namespace string, properties map[string]inte
 		err := m.kubectl.Create(namespace, objects[i])
 		if err != nil {
 			// TODO XXXXXXXX rollback
-			return err
+			return groupID.String(), err
 		}
 		fmt.Println("-----")
 	}
-	return nil
+	return groupID.String(), nil
 }
 
 // DeleteInstance will delete a installed pak

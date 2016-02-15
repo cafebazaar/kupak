@@ -100,7 +100,7 @@ func install(c *cli.Context) {
 		os.Exit(-1)
 	}
 
-	err = manager.Install(pak, c.GlobalString("namespace"), values)
+	_, err = manager.Install(pak, c.GlobalString("namespace"), values)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(-1)
