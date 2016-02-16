@@ -49,6 +49,12 @@ func main() {
 			Usage:   "list all installed packages",
 			Action:  list,
 		},
+		{
+			Name:    "spec",
+			Aliases: []string{"s"},
+			Usage:   "print specification of a pak",
+			Action:  spec,
+		},
 	}
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -113,12 +119,14 @@ func paks(c *cli.Context) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(-1)
 	}
-	fmt.Println("List of available Paks:")
 	for i := range repo.Paks {
 		fmt.Println("- Name:", repo.Paks[i].Name)
 		fmt.Println("  Version:", repo.Paks[i].Version)
-		fmt.Println("  Tags:", "["+strings.Join(repo.Paks[i].Tags, ", ")+"]")
-		fmt.Println()
+		fmt.Println("  URL:", repo.Paks[i].URL)
+		if len(repo.Paks[i].Tags) > 0 {
+			fmt.Println("  Tags:", "["+strings.Join(repo.Paks[i].Tags, ", ")+"]")
+		}
+		fmt.Println(" ", strings.Trim(repo.Paks[i].Description, "\n"))
 	}
 }
 
@@ -128,7 +136,6 @@ func list(c *cli.Context) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(-1)
 	}
-
 	for i := range paks {
 		fmt.Printf("Pak URL:  %s\n", paks[i].PakURL)
 		fmt.Printf("Group ID: %s\n", paks[i].GroupID)
@@ -150,5 +157,36 @@ func list(c *cli.Context) {
 			}
 		}
 		fmt.Println()
+	}
+}
+
+func spec(c *cli.Context) {
+	pakURL := c.Args().First()
+	if pakURL == "" {
+		fmt.Fprintln(os.Stderr, "please specify the pak")
+		os.Exit(-1)
+	}
+	pak, err := kupak.PakFromURL(pakURL)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "error: ", err)
+		os.Exit(-1)
+	}
+	fmt.Println("Name:", pak.Name)
+	fmt.Println("Version:", pak.Version)
+	if len(pak.Tags) > 0 {
+		fmt.Println("Tags:", "["+strings.Join(pak.Tags, ", ")+"]")
+	}
+	fmt.Println(strings.Trim(pak.Description, "\n"))
+
+	fmt.Println("\nProperties:")
+	for i := range pak.Properties {
+		property := pak.Properties[i]
+		fmt.Println(" - Name:", property.Name)
+		fmt.Println("   Description:", strings.Trim(property.Description, "\n"))
+		fmt.Println("   Type:", property.Type)
+		if property.Default != nil {
+			fmt.Println("   Default:", property.Default)
+		}
+
 	}
 }
