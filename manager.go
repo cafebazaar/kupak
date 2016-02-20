@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ghodss/yaml"
 	"github.com/nu7hatch/gouuid"
 )
 
@@ -69,6 +70,15 @@ func (m *Manager) Installed(namespace string) ([]*InstalledPak, error) {
 				}
 				installedPak.Statuses[md.Name] = status
 			}
+
+			// properties values
+			if propertiesRaw, has := md.Annotations["kp-pak-properties"]; installedPak.PropertiesValues == nil && has {
+				var properties map[string]interface{}
+				if err := yaml.Unmarshal([]byte(propertiesRaw), properties); err != nil {
+					return nil, err
+				}
+				installedPak.PropertiesValues = properties
+			}
 		}
 		installedPaks = append(installedPaks, installedPak)
 	}
@@ -94,9 +104,14 @@ func (m *Manager) Install(pak *Pak, namespace string, properties map[string]inte
 		"kp-group-id": groupID.String(),
 		"kp-pak-id":   pak.ID(),
 	}
+	propertiesYaml, err := yaml.Marshal(properties)
+	if err != nil {
+		return "", err
+	}
 	annotations := map[string]string{
-		"kp-pak-url":      pak.URL,
-		"kp-created-time": time.Now().String(),
+		"kp-pak-url":        pak.URL,
+		"kp-created-time":   time.Now().String(),
+		"kp-pak-properties": string(propertiesYaml),
 	}
 
 	var objects []*Object
