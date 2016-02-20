@@ -12,7 +12,10 @@ import (
 // TODO refactor err handling and make distinct error types
 
 var (
-	KubePath   string
+	// KubePath is the path to kubectl executable
+	KubePath string
+
+	// KubeConfig is the path to kubeconfig
 	KubeConfig string
 )
 
@@ -34,7 +37,7 @@ type kubeList struct {
 
 type Kubectl interface {
 	// Get returns Objects with given selector
-	Get(namespace string, type_ string, selector string) ([]*Object, error)
+	Get(namespace string, objType string, selector string) ([]*Object, error)
 
 	// Create creates a kubernetes objects
 	Create(namespace string, o *Object) error
@@ -48,11 +51,11 @@ func NewKubectlRunner() (*KubectlRunner, error) {
 	return &KubectlRunner{}, nil
 }
 
-func (k *KubectlRunner) Get(namespace string, type_ string, selector string) ([]*Object, error) {
-	if type_ == "" {
-		type_ = "all"
+func (k *KubectlRunner) Get(namespace string, objType string, selector string) ([]*Object, error) {
+	if objType == "" {
+		objType = "all"
 	}
-	args := []string{"-o", "json", "get", type_}
+	args := []string{"-o", "json", "get", objType}
 	if KubeConfig != "" {
 		args = append(args, "--kubeconfig", KubeConfig)
 	}
