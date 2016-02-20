@@ -2,7 +2,7 @@ package kupak
 
 import (
 	"bytes"
-	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 
@@ -66,7 +66,7 @@ func (k *KubectlRunner) Get(namespace string, type_ string, selector string) ([]
 	cmd := exec.Command(KubePath, args...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, errors.New(string(output))
+		return nil, fmt.Errorf("kubectl error: %v - %s", err, string(output))
 	}
 
 	list := kubeList{}
@@ -105,7 +105,7 @@ func (k *KubectlRunner) Create(namespace string, o *Object) error {
 	cmd.Stdin = bytes.NewBuffer(inBuffer)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return errors.New(string(output))
+		return fmt.Errorf("kubectl error: %v - %s", err, string(output))
 	}
 	return nil
 }
