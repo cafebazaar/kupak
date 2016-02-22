@@ -138,7 +138,7 @@ func list(c *cli.Context) {
 	}
 	for i := range paks {
 		fmt.Printf("Pak URL:  %s\n", paks[i].PakURL)
-		fmt.Printf("Group ID: %s\n", paks[i].GroupID)
+		fmt.Printf("Group: %s\n", paks[i].Group)
 		fmt.Printf("Objects:\n")
 		for j := range paks[i].Objects {
 			obj := paks[i].Objects[j]

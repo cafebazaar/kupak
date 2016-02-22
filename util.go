@@ -3,11 +3,15 @@ package kupak
 import (
 	"errors"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"path"
 	"strings"
+	"time"
 )
+
+var random *rand.Rand
 
 func fetchURL(url string) ([]byte, error) {
 	if strings.HasPrefix(strings.ToLower(url), "http://") ||
@@ -70,4 +74,20 @@ func mergeStringMaps(a map[string]string, b map[string]string) map[string]string
 		out[k] = v
 	}
 	return out
+}
+
+func generateRandomString(chars string, lenght int) string {
+	if random == nil {
+		random = rand.New(rand.NewSource(time.Now().UnixNano()))
+	}
+	randStr := make([]byte, lenght)
+	charsLen := len(chars)
+	for i := 0; i < lenght; i++ {
+		randStr[i] = chars[random.Intn(charsLen)]
+	}
+	return string(randStr)
+}
+
+func generateRandomGroup() string {
+	return generateRandomString("abcdefghijklmnopqrstuvwxyz1234567890", 24)
 }

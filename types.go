@@ -47,7 +47,7 @@ type Repo struct {
 
 // InstalledPak Represents an installed pak with a unique Group
 type InstalledPak struct {
-	GroupID          string
+	Group            string
 	Namespace        string
 	PakURL           string
 	PropertiesValues map[string]interface{}

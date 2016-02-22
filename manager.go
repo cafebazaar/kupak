@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/ghodss/yaml"
-	"github.com/nu7hatch/gouuid"
 )
 
 // Manager manages installation and deploying pak to a kubernetes cluster
@@ -33,9 +32,9 @@ func (m *Manager) Installed(namespace string) ([]*InstalledPak, error) {
 		if err != nil {
 			return nil, err
 		}
-		groupID, has := md.Labels["kp-group-id"]
+		group, has := md.Labels["kp-group"]
 		if has {
-			groups[groupID] = append(groups[groupID], objects[i])
+			groups[group] = append(groups[group], objects[i])
 		}
 	}
 
@@ -44,7 +43,7 @@ func (m *Manager) Installed(namespace string) ([]*InstalledPak, error) {
 		// create InstalledPak objects from group
 		installedPak := &InstalledPak{}
 		installedPak.Statuses = make(map[string]*PodStatus)
-		installedPak.GroupID = k
+		installedPak.Group = k
 		installedPak.Objects = v
 		for i := range v {
 			md, err := v[i].Metadata()
@@ -89,20 +88,28 @@ func (m *Manager) Installed(namespace string) ([]*InstalledPak, error) {
 // func (m *Manager) Instances(namespace string, pak *Pak) ([]*InstalledPak, error)
 // func (m *Manager) Status(namespace string, instance string) (*InstalledPak, error)
 
-// Install a pak with given name and returns its groupID
+// Install a pak with given name and returns its group
 func (m *Manager) Install(pak *Pak, namespace string, properties map[string]interface{}) (string, error) {
+	var group string
+	// try to get group from properties, if it doesn't exists create a random
+	// group and add it to properties
+	if val, has := properties["group"]; has {
+		group = val.(string)
+	} else {
+		group = generateRandomGroup()
+		properties["group"] = group
+	}
+
+	// execute the templates
 	rawObjects, err := pak.ExecuteTemplates(properties)
 	if err != nil {
 		return "", err
 	}
 
-	groupID, err := uuid.NewV4()
-	if err != nil {
-		return "", err
-	}
+	// labels and annotations
 	labels := map[string]string{
-		"kp-group-id": groupID.String(),
-		"kp-pak-id":   pak.ID(),
+		"kp-group":  group,
+		"kp-pak-id": pak.ID(),
 	}
 	propertiesYaml, err := yaml.Marshal(properties)
 	if err != nil {
@@ -113,7 +120,6 @@ func (m *Manager) Install(pak *Pak, namespace string, properties map[string]inte
 		"kp-created-time":   time.Now().String(),
 		"kp-pak-properties": string(propertiesYaml),
 	}
-
 	var objects []*Object
 	for i := range rawObjects {
 		object, err := NewObject(rawObjects[i])
@@ -144,18 +150,24 @@ func (m *Manager) Install(pak *Pak, namespace string, properties map[string]inte
 		objects = append(objects, object)
 	}
 
-	// install
+	// install the objects
 	for i := range objects {
 		data, _ := objects[i].Bytes()
 		fmt.Println(string(data))
 		err := m.kubectl.Create(namespace, objects[i])
 		if err != nil {
 			// TODO XXXXXXXX rollback
-			return groupID.String(), fmt.Errorf("failed calling kubectl.Create: %v", err)
+			return group, fmt.Errorf("failed calling kubectl.Create: %v", err)
 		}
 		fmt.Println("-----")
 	}
-	return groupID.String(), nil
+
+	return group, nil
+}
+
+// HasGroup checks is the specfied group is unique or not
+func (m *Manager) HasGroup(group string) bool {
+	return false
 }
 
 // DeleteInstance will delete a installed pak
