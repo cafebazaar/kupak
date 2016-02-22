@@ -100,13 +100,22 @@ func (m *Manager) Install(pak *Pak, namespace string, properties map[string]inte
 		properties["group"] = group
 	}
 
+	// check for group duplication
+	hasGroup, err := m.HasGroup(namespace, group)
+	if err != nil {
+		return "", err
+	}
+	if hasGroup {
+		return "", fmt.Errorf("Install: duplicated group '%s'", group)
+	}
+
 	// execute the templates
 	rawObjects, err := pak.ExecuteTemplates(properties)
 	if err != nil {
 		return "", err
 	}
 
-	// labels and annotations
+	// apply labels and annotations
 	labels := map[string]string{
 		"kp-group":  group,
 		"kp-pak-id": pak.ID(),
@@ -166,8 +175,15 @@ func (m *Manager) Install(pak *Pak, namespace string, properties map[string]inte
 }
 
 // HasGroup checks is the specfied group is unique or not
-func (m *Manager) HasGroup(group string) bool {
-	return false
+func (m *Manager) HasGroup(namespace string, group string) (bool, error) {
+	objects, err := m.kubectl.Get(namespace, "all", "kp-group="+group)
+	if err != nil {
+		return true, fmt.Errorf("HasGroup: %v", err)
+	}
+	if len(objects) > 0 {
+		return true, nil
+	}
+	return false, nil
 }
 
 // DeleteInstance will delete a installed pak
