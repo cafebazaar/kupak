@@ -73,7 +73,7 @@ func (m *Manager) Installed(namespace string) ([]*InstalledPak, error) {
 			// properties values
 			if propertiesRaw, has := md.Annotations["kp-pak-properties"]; installedPak.PropertiesValues == nil && has {
 				var properties map[string]interface{}
-				if err := yaml.Unmarshal([]byte(propertiesRaw), properties); err != nil {
+				if err := yaml.Unmarshal([]byte(propertiesRaw), &properties); err != nil {
 					return nil, err
 				}
 				installedPak.PropertiesValues = properties
