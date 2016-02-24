@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 
 	"github.com/ghodss/yaml"
 )
@@ -28,6 +29,9 @@ func init() {
 	}
 	if KubeConfig == "" {
 		KubeConfig = os.Getenv("KUBECTL_CONFIG")
+	}
+	if KubeConfig == "" {
+		KubeConfig = path.Join(os.Getenv("HOME"), ".kube", "config")
 	}
 }
 
