@@ -2,6 +2,7 @@ package util
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -90,4 +91,14 @@ func GenerateRandomString(chars string, lenght int) string {
 
 func GenerateRandomGroup() string {
 	return GenerateRandomString("abcdefghijklmnopqrstuvwxyz1234567890", 24)
+}
+
+func StringToBool(s string) (bool, error) {
+	s = strings.ToLower(s)
+	if s == "true" || s == "yes" || s == "y" || s == "ok" || s == "t" || s == "1" {
+		return true, nil
+	} else if s == "false" || s == "n" || s == "no" || s == "f" || s == "0" {
+		return false, nil
+	}
+	return false, fmt.Errorf("can't parse \"%s\" as boolean", s)
 }

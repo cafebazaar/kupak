@@ -11,6 +11,7 @@ import (
 	"git.cafebazaar.ir/alaee/kupak/kubectl"
 	"git.cafebazaar.ir/alaee/kupak/manager"
 	"git.cafebazaar.ir/alaee/kupak/pak"
+	"git.cafebazaar.ir/alaee/kupak/util"
 	"github.com/codegangsta/cli"
 	"github.com/ghodss/yaml"
 )
@@ -82,16 +83,6 @@ func main() {
 	app.Run(os.Args)
 }
 
-func stringToBool(s string) (bool, error) {
-	s = strings.ToLower(s)
-	if s == "true" || s == "yes" || s == "y" || s == "ok" {
-		return true, nil
-	} else if s == "false" || s == "n" || s == "no" {
-		return false, nil
-	}
-	return false, fmt.Errorf("can't parse \"%s\" as boolean", s)
-}
-
 func install(c *cli.Context) {
 	pakURL := c.Args().First()
 	valuesFile := c.Args().Get(1)
@@ -117,7 +108,7 @@ func install(c *cli.Context) {
 			} else {
 				prompt = fmt.Sprintf("Field \"%s\" [type: %s, default: %v] (return for default)? ", p.Properties[i].Name, p.Properties[i].Type, p.Properties[i].Default)
 			}
-			value, err := askValue(prompt, p.Properties[i].Type, p.Properties[i].Default == nil)
+			value, err := scanValue(prompt, p.Properties[i].Type, p.Properties[i].Default == nil)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(-1)
@@ -145,13 +136,11 @@ func install(c *cli.Context) {
 		}
 	}
 
-	fmt.Println(values)
-
-	// _, err = pakManager.Install(p, c.GlobalString("namespace"), values)
-	// if err != nil {
-	// 	fmt.Fprintln(os.Stderr, err)
-	// 	os.Exit(-1)
-	// }
+	_, err = pakManager.Install(p, c.GlobalString("namespace"), values)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(-1)
+	}
 }
 
 func paks(c *cli.Context) {
@@ -232,7 +221,7 @@ func spec(c *cli.Context) {
 	}
 }
 
-func askValue(prompt string, valueType string, required bool) (interface{}, error) {
+func scanValue(prompt string, valueType string, required bool) (interface{}, error) {
 	bio := bufio.NewReader(os.Stdin)
 	var value []byte
 	var err error
@@ -259,7 +248,7 @@ func askValue(prompt string, valueType string, required bool) (interface{}, erro
 			}
 			return i, nil
 		case "bool":
-			b, err := stringToBool(string(value))
+			b, err := util.StringToBool(string(value))
 			if err != nil {
 				fmt.Println(err)
 				continue

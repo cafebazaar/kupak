@@ -22,7 +22,7 @@ func validateProperties(properties []Property) error {
 		// validating types
 		switch properties[i].Type {
 		case "int":
-		case "number":
+		case "bool":
 		case "string":
 			// TODO validate the default value and other type specification
 			_ = "ok"
@@ -59,25 +59,49 @@ func (p *Pak) fetchAndMakeTemplates(baseURL string) error {
 	return nil
 }
 
-// ExecuteTemplates generate resources of a pak with given values
-func (p *Pak) ExecuteTemplates(values map[string]interface{}) ([][]byte, error) {
-	// TODO validate values
-	// TODO copy values
-
-	// check all required values are given
+// ValidateValues validates given values with corresponding properties
+// given values should be contain defaults - use MergeValuesWithDefaults before
+// passing values to this function
+func (p *Pak) ValidateValues(values map[string]interface{}) error {
+	// check all required values are given and their values are ok
 	for i := range p.Properties {
-		_, has := values[p.Properties[i].Name]
-		if p.Properties[i].Default == nil && !has {
-			return nil, errors.New("required property '" + p.Properties[i].Name + "' is not specified")
+		v, has := values[p.Properties[i].Name]
+		if !has {
+			return errors.New("required property '" + p.Properties[i].Name + "' is not specified")
+		}
+
+		ok := false
+		switch p.Properties[i].Type {
+		case "string":
+			_, ok = v.(string)
+		case "int":
+			_, ok = v.(int)
+		case "bool":
+			_, ok = v.(bool)
+		}
+		if !ok {
+			return fmt.Errorf("value \"%v\" for property \"%s\" is not correct", v, p.Properties[i].Name)
 		}
 	}
+	return nil
+}
 
+// ExecuteTemplates generate resources of a pak with given values
+func (p *Pak) ExecuteTemplates(values map[string]interface{}) ([][]byte, error) {
+	// merge default values
+	values, err := p.MergeValuesWithDefaults(values)
+	if err != nil {
+		return nil, err
+	}
+
+	err = p.ValidateValues(values)
+	if err != nil {
+		return nil, err
+	}
 	outputs := make([][]byte, len(p.Templates))
 	for i := range p.Templates {
 		buffer := &bytes.Buffer{}
-		if err := p.valuesWithDefaults(values); err != nil {
-			return nil, err
-		}
+
 		if err := p.Templates[i].Execute(buffer, values); err != nil {
 			return nil, err
 		}
@@ -86,13 +110,18 @@ func (p *Pak) ExecuteTemplates(values map[string]interface{}) ([][]byte, error) 
 	return outputs, nil
 }
 
-func (p *Pak) valuesWithDefaults(values map[string]interface{}) error {
+// MergeValuesWithDefaults add default values for properties that not exists in values
+func (p *Pak) MergeValuesWithDefaults(values map[string]interface{}) (map[string]interface{}, error) {
+	result := make(map[string]interface{})
 	for i := range p.Properties {
-		if _, ok := values[p.Properties[i].Name]; !ok {
-			values[p.Properties[i].Name] = p.Properties[i].Default
+		value, ok := values[p.Properties[i].Name]
+		if ok {
+			result[p.Properties[i].Name] = value
+		} else if value := p.Properties[i].Default; value != nil {
+			values[p.Properties[i].Name] = value
 		}
 	}
-	return nil
+	return result, nil
 }
 
 // FromURL reads a pak.yaml file and fetches all the resources files
