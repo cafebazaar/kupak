@@ -1,4 +1,4 @@
-package kupak
+package util
 
 import (
 	"errors"
@@ -13,7 +13,7 @@ import (
 
 var random *rand.Rand
 
-func fetchURL(url string) ([]byte, error) {
+func FetchURL(url string) ([]byte, error) {
 	if strings.HasPrefix(strings.ToLower(url), "http://") ||
 		strings.HasPrefix(strings.ToLower(url), "https://") {
 		c := &http.Client{}
@@ -31,7 +31,7 @@ func fetchURL(url string) ([]byte, error) {
 	return ioutil.ReadFile(url)
 }
 
-func joinURL(baseURL string, secondURL string) string {
+func JoinURL(baseURL string, secondURL string) string {
 	// only combine path part if baseURL is url not a local file and it make sense
 	base, err := url.Parse(baseURL)
 	if err == nil {
@@ -41,7 +41,7 @@ func joinURL(baseURL string, secondURL string) string {
 	return path.Join(path.Dir(baseURL), secondURL)
 }
 
-func getMapChild(keys []string, m map[string]interface{}) (interface{}, error) {
+func GetMapChild(keys []string, m map[string]interface{}) (interface{}, error) {
 	var innerMap map[string]interface{}
 	var v interface{}
 	var has, ok bool
@@ -62,7 +62,7 @@ func getMapChild(keys []string, m map[string]interface{}) (interface{}, error) {
 	return v, nil
 }
 
-func mergeStringMaps(a map[string]string, b map[string]string) map[string]string {
+func MergeStringMaps(a map[string]string, b map[string]string) map[string]string {
 	if a == nil {
 		a = make(map[string]string)
 	}
@@ -76,7 +76,7 @@ func mergeStringMaps(a map[string]string, b map[string]string) map[string]string
 	return out
 }
 
-func generateRandomString(chars string, lenght int) string {
+func GenerateRandomString(chars string, lenght int) string {
 	if random == nil {
 		random = rand.New(rand.NewSource(time.Now().UnixNano()))
 	}
@@ -88,6 +88,6 @@ func generateRandomString(chars string, lenght int) string {
 	return string(randStr)
 }
 
-func generateRandomGroup() string {
-	return generateRandomString("abcdefghijklmnopqrstuvwxyz1234567890", 24)
+func GenerateRandomGroup() string {
+	return GenerateRandomString("abcdefghijklmnopqrstuvwxyz1234567890", 24)
 }

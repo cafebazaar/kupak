@@ -1,4 +1,4 @@
-package kupak
+package pak
 
 import (
 	"bytes"
@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"text/template"
+
+	"git.cafebazaar.ir/alaee/kupak/util"
 
 	"github.com/ghodss/yaml"
 )
@@ -41,8 +43,8 @@ func (p *Pak) ID() string {
 func (p *Pak) fetchAndMakeTemplates(baseURL string) error {
 	p.Templates = make([]*template.Template, len(p.ResourceURLs))
 	for i := range p.ResourceURLs {
-		url := joinURL(baseURL, p.ResourceURLs[i])
-		data, err := fetchURL(url)
+		url := util.JoinURL(baseURL, p.ResourceURLs[i])
+		data, err := util.FetchURL(url)
 		if err != nil {
 			return err
 		}
@@ -93,9 +95,9 @@ func (p *Pak) valuesWithDefaults(values map[string]interface{}) error {
 	return nil
 }
 
-// PakFromURL reads a pak.yaml file and fetches all the resources files
-func PakFromURL(url string) (*Pak, error) {
-	data, err := fetchURL(url)
+// FromURL reads a pak.yaml file and fetches all the resources files
+func FromURL(url string) (*Pak, error) {
+	data, err := util.FetchURL(url)
 	if err != nil {
 		return nil, err
 	}

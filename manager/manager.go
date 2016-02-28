@@ -1,32 +1,35 @@
-package kupak
+package manager
 
 import (
 	"fmt"
 	"strings"
 	"time"
 
+	"git.cafebazaar.ir/alaee/kupak/kubectl"
+	"git.cafebazaar.ir/alaee/kupak/pak"
+	"git.cafebazaar.ir/alaee/kupak/util"
 	"github.com/ghodss/yaml"
 )
 
 // Manager manages installation and deploying pak to a kubernetes cluster
 type Manager struct {
-	kubectl Kubectl
+	kubectl kubectl.Kubectl
 }
 
 // NewManager returns a Manager
-func NewManager(kubectl Kubectl) (*Manager, error) {
+func NewManager(kubectl kubectl.Kubectl) (*Manager, error) {
 	return &Manager{kubectl: kubectl}, nil
 }
 
 // Installed returns all installed paks in given namespace
-func (m *Manager) Installed(namespace string) ([]*InstalledPak, error) {
+func (m *Manager) Installed(namespace string) ([]*pak.InstalledPak, error) {
 	objects, err := m.kubectl.Get(namespace, "all", "")
 	if err != nil {
 		return nil, err
 	}
 
 	// group all paks
-	groups := make(map[string][]*Object)
+	groups := make(map[string][]*kubectl.Object)
 	for i := range objects {
 		md, err := objects[i].Metadata()
 		if err != nil {
@@ -38,11 +41,11 @@ func (m *Manager) Installed(namespace string) ([]*InstalledPak, error) {
 		}
 	}
 
-	var installedPaks []*InstalledPak
+	var installedPaks []*pak.InstalledPak
 	for k, v := range groups {
 		// create InstalledPak objects from group
-		installedPak := &InstalledPak{}
-		installedPak.Statuses = make(map[string]*PodStatus)
+		installedPak := &pak.InstalledPak{}
+		installedPak.Statuses = make(map[string]*kubectl.PodStatus)
 		installedPak.Group = k
 		installedPak.Objects = v
 		for i := range v {
@@ -89,14 +92,14 @@ func (m *Manager) Installed(namespace string) ([]*InstalledPak, error) {
 // func (m *Manager) Status(namespace string, instance string) (*InstalledPak, error)
 
 // Install a pak with given name and returns its group
-func (m *Manager) Install(pak *Pak, namespace string, properties map[string]interface{}) (string, error) {
+func (m *Manager) Install(pak *pak.Pak, namespace string, properties map[string]interface{}) (string, error) {
 	var group string
 	// try to get group from properties, if it doesn't exists create a random
 	// group and add it to properties
 	if val, has := properties["group"]; has {
 		group = val.(string)
 	} else {
-		group = generateRandomGroup()
+		group = util.GenerateRandomGroup()
 		properties["group"] = group
 	}
 
@@ -129,9 +132,9 @@ func (m *Manager) Install(pak *Pak, namespace string, properties map[string]inte
 		"kp-created-time":   time.Now().String(),
 		"kp-pak-properties": string(propertiesYaml),
 	}
-	var objects []*Object
+	var objects []*kubectl.Object
 	for i := range rawObjects {
-		object, err := NewObject(rawObjects[i])
+		object, err := kubectl.NewObject(rawObjects[i])
 		if err != nil {
 			return "", err
 		}
@@ -141,7 +144,7 @@ func (m *Manager) Install(pak *Pak, namespace string, properties map[string]inte
 			return "", err
 		}
 
-		mergedLabels := mergeStringMaps(md.Labels, labels)
+		mergedLabels := util.MergeStringMaps(md.Labels, labels)
 		if err = object.SetLabels(mergedLabels); err != nil {
 			return "", err
 		}
@@ -151,7 +154,7 @@ func (m *Manager) Install(pak *Pak, namespace string, properties map[string]inte
 
 		// TODO validation for replication controller - do not ignore
 		if templateMd, err := object.TemplateMetadata(); err == nil {
-			mergedLabels := mergeStringMaps(templateMd.Labels, labels)
+			mergedLabels := util.MergeStringMaps(templateMd.Labels, labels)
 			if err = object.SetTemplateLabels(mergedLabels); err != nil {
 				return "", err
 			}
@@ -187,6 +190,6 @@ func (m *Manager) HasGroup(namespace string, group string) (bool, error) {
 }
 
 // DeleteInstance will delete a installed pak
-func (m *Manager) DeleteInstance(namespace string, group string) ([]*InstalledPak, error) {
+func (m *Manager) DeleteInstance(namespace string, group string) ([]*pak.InstalledPak, error) {
 	return nil, nil
 }

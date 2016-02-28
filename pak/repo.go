@@ -1,8 +1,10 @@
-package kupak
+package pak
 
 import (
 	"errors"
 	"strings"
+
+	"git.cafebazaar.ir/alaee/kupak/util"
 
 	"github.com/ghodss/yaml"
 )
@@ -36,18 +38,18 @@ func RepoFromURL(repoURL string) (*Repo, error) {
 	// both one by one and check for it existence
 	if !strings.HasSuffix(repoURL, ".json") && !strings.HasSuffix(repoURL, ".yaml") {
 		// check if .yaml exists
-		yamlURL := joinURL(repoURL, "index.yaml")
+		yamlURL := util.JoinURL(repoURL, "index.yaml")
 		repo, err := RepoFromURL(yamlURL)
 		if err == nil {
 			return repo, nil
 		}
 
 		// check if .json
-		jsonURL := joinURL(repoURL, "index.json")
+		jsonURL := util.JoinURL(repoURL, "index.json")
 		return RepoFromURL(jsonURL)
 	}
 
-	data, err := fetchURL(repoURL)
+	data, err := util.FetchURL(repoURL)
 	if err != nil {
 		return nil, err
 	}
@@ -83,8 +85,8 @@ func (r *Repo) HasVersion(pak string, version string) bool {
 func (r *Repo) Pak(pak string, version string) (*Pak, error) {
 	for i := range r.Paks {
 		if r.Paks[i].Name == pak && r.Paks[i].Version == version {
-			url := joinURL(r.URL, r.Paks[i].URL)
-			pak, err := PakFromURL(url)
+			url := util.JoinURL(r.URL, r.Paks[i].URL)
+			pak, err := FromURL(url)
 			if err != nil {
 				return nil, err
 			}

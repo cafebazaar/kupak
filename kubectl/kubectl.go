@@ -1,4 +1,4 @@
-package kupak
+package kubectl
 
 import (
 	"bytes"
@@ -37,14 +37,6 @@ func init() {
 
 type kubeList struct {
 	Items []interface{} `json:"items"`
-}
-
-type Kubectl interface {
-	// Get returns Objects with given selector
-	Get(namespace string, objType string, selector string) ([]*Object, error)
-
-	// Create creates a kubernetes objects
-	Create(namespace string, o *Object) error
 }
 
 // KubectlRunner is a real implementation of Kubectl interface which uses kubectl

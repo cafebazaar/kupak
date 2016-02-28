@@ -1,10 +1,14 @@
-package kupak
+package pak
 
-import "text/template"
+import (
+	"text/template"
 
-// PakInfo contains basic information about the pak that doesn't need
+	"git.cafebazaar.ir/alaee/kupak/kubectl"
+)
+
+// Info contains basic information about the pak that doesn't need
 // to be fetched
-type PakInfo struct {
+type Info struct {
 	Name        string   `json:"name"`
 	Version     string   `json:"version"`
 	URL         string   `json:"url"`
@@ -13,14 +17,14 @@ type PakInfo struct {
 	Icon        string   `json:"icon,omitempty"`
 }
 
-func (p *PakInfo) String() string {
+func (p *Info) String() string {
 	str := "Pak{" + p.Name + ", Ver: " + p.Version + ", Url: " + p.URL + "}"
 	return str
 }
 
 // Pak contains all the data and information that needed for installing it
 type Pak struct {
-	PakInfo      `json:",inline"`
+	Info         `json:",inline"`
 	Properties   []Property `json:"properties,omitempty"`
 	ResourceURLs []string   `json:"resources"`
 
@@ -37,23 +41,23 @@ type Property struct {
 	Default     interface{} `json:"default,omitempty"`
 }
 
-// Repo represents an index file that contains list of paks
-type Repo struct {
-	URL         string     `json:""`
-	Name        string     `json:"name"`
-	Description string     `json:"description,omitempty"`
-	Maintainer  string     `json:"maintainer,omitempty"`
-	Paks        []*PakInfo `json:"packages"`
-}
-
 // InstalledPak Represents an installed pak with a unique Group
 type InstalledPak struct {
 	Group            string
 	Namespace        string
 	PakURL           string
 	PropertiesValues map[string]interface{}
-	Objects          []*Object
+	Objects          []*kubectl.Object
 
 	// Map of pod's name and its status
-	Statuses map[string]*PodStatus
+	Statuses map[string]*kubectl.PodStatus
+}
+
+// Repo represents an index file that contains list of paks
+type Repo struct {
+	URL         string  `json:""`
+	Name        string  `json:"name"`
+	Description string  `json:"description,omitempty"`
+	Maintainer  string  `json:"maintainer,omitempty"`
+	Paks        []*Info `json:"packages"`
 }

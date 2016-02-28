@@ -6,21 +6,22 @@ import (
 	"os"
 	"strings"
 
-	"git.cafebazaar.ir/alaee/kupak"
-
+	"git.cafebazaar.ir/alaee/kupak/kubectl"
+	"git.cafebazaar.ir/alaee/kupak/manager"
+	"git.cafebazaar.ir/alaee/kupak/pak"
 	"github.com/codegangsta/cli"
 	"github.com/ghodss/yaml"
 )
 
-var manager *kupak.Manager
+var pakManager *manager.Manager
 
 func main() {
-	kubectl, err := kupak.NewKubectlRunner()
+	kc, err := kubectl.NewKubectlRunner()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(-1)
 	}
-	manager, err = kupak.NewManager(kubectl)
+	pakManager, err = manager.NewManager(kc)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(-1)
@@ -81,7 +82,7 @@ func install(c *cli.Context) {
 		os.Exit(-1)
 	}
 
-	pak, err := kupak.PakFromURL(pakURL)
+	p, err := pak.FromURL(pakURL)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(-1)
@@ -106,7 +107,7 @@ func install(c *cli.Context) {
 		os.Exit(-1)
 	}
 
-	_, err = manager.Install(pak, c.GlobalString("namespace"), values)
+	_, err = pakManager.Install(p, c.GlobalString("namespace"), values)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(-1)
@@ -114,7 +115,7 @@ func install(c *cli.Context) {
 }
 
 func paks(c *cli.Context) {
-	repo, err := kupak.RepoFromURL(c.GlobalString("repo"))
+	repo, err := pak.RepoFromURL(c.GlobalString("repo"))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(-1)
@@ -131,7 +132,7 @@ func paks(c *cli.Context) {
 }
 
 func list(c *cli.Context) {
-	paks, err := manager.Installed(c.GlobalString("namespace"))
+	paks, err := pakManager.Installed(c.GlobalString("namespace"))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(-1)
@@ -166,21 +167,21 @@ func spec(c *cli.Context) {
 		fmt.Fprintln(os.Stderr, "please specify the pak")
 		os.Exit(-1)
 	}
-	pak, err := kupak.PakFromURL(pakURL)
+	p, err := pak.FromURL(pakURL)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "error: ", err)
 		os.Exit(-1)
 	}
-	fmt.Println("Name:", pak.Name)
-	fmt.Println("Version:", pak.Version)
-	if len(pak.Tags) > 0 {
-		fmt.Println("Tags:", "["+strings.Join(pak.Tags, ", ")+"]")
+	fmt.Println("Name:", p.Name)
+	fmt.Println("Version:", p.Version)
+	if len(p.Tags) > 0 {
+		fmt.Println("Tags:", "["+strings.Join(p.Tags, ", ")+"]")
 	}
-	fmt.Println(strings.Trim(pak.Description, "\n"))
+	fmt.Println(strings.Trim(p.Description, "\n"))
 
 	fmt.Println("\nProperties:")
-	for i := range pak.Properties {
-		property := pak.Properties[i]
+	for i := range p.Properties {
+		property := p.Properties[i]
 		fmt.Println(" - Name:", property.Name)
 		fmt.Println("   Description:", strings.Trim(property.Description, "\n"))
 		fmt.Println("   Type:", property.Type)

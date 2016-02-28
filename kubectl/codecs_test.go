@@ -1,6 +1,8 @@
-package kupak
+package kubectl
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestObjectMetadata(t *testing.T) {
 	obj := Object{data: rc}
@@ -82,7 +84,7 @@ func TestTemplateLabels(t *testing.T) {
 	}
 }
 
-var rc []byte = []byte(`apiVersion: v1
+var rc = []byte(`apiVersion: v1
 kind: ReplicationController
 metadata:
   name: redis-standalone
