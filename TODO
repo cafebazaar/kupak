@@ -1,0 +1,11 @@
+[ ] Remove a Pak
+[ ] Documentation
+[ ] Ask for Group in interactive mode
+[ ] Errors refactoring
+    Distinct types for error
+[ ] Refactoring in general
+[ ] Validation in installation and distinct functions for validations used in
+    third-party apps
+[ ] Simplification of URLs in paks and repos
+[ ] Update
+[ ] Simplifying the CLI (both semantics and codes)
