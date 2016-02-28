@@ -24,6 +24,9 @@ TODO
 ### Usage
 TODO
 
+### Writing a Pak
+[See this](docs/pak.md)
+
 ## License
 Copyright 2016 Hezardastan, Inc.
 
