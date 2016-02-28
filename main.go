@@ -132,7 +132,7 @@ func paks(c *cli.Context) {
 }
 
 func list(c *cli.Context) {
-	paks, err := pakManager.Installed(c.GlobalString("namespace"))
+	paks, err := pakManager.List(c.GlobalString("namespace"))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(-1)
