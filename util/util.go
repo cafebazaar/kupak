@@ -77,13 +77,13 @@ func MergeStringMaps(a map[string]string, b map[string]string) map[string]string
 	return out
 }
 
-func GenerateRandomString(chars string, lenght int) string {
+func GenerateRandomString(chars string, length int) string {
 	if random == nil {
 		random = rand.New(rand.NewSource(time.Now().UnixNano()))
 	}
-	randStr := make([]byte, lenght)
+	randStr := make([]byte, length)
 	charsLen := len(chars)
-	for i := 0; i < lenght; i++ {
+	for i := 0; i < length; i++ {
 		randStr[i] = chars[random.Intn(charsLen)]
 	}
 	return string(randStr)
