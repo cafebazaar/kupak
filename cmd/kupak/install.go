@@ -35,11 +35,11 @@ func install(c *cli.Context) {
 	}
 	fmt.Println(values)
 
-	// _, err = pakManager.Install(p, c.GlobalString("namespace"), values)
-	// if err != nil {
-	// 	fmt.Fprintln(os.Stderr, err)
-	// 	os.Exit(-1)
-	// }
+	_, err = pakManager.Install(p, c.GlobalString("namespace"), values)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(-1)
+	}
 }
 
 func readValuesFromFile(p *pak.Pak, path string) map[string]interface{} {

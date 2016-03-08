@@ -8,6 +8,9 @@ type Kubectl interface {
 
 	// Create creates a kubernetes objects
 	Create(namespace string, o *Object) error
+
+	// Delete deletes an object from kubernetes cluster
+	Delete(namespace string, o *Object) error
 }
 
 // Object is a represention of a Kubernetes' object

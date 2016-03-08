@@ -47,6 +47,12 @@ func main() {
 			},
 		},
 		{
+			Name:    "remove",
+			Aliases: []string{"r"},
+			Usage:   "remove the pak specified by group name",
+			Action:  remove,
+		},
+		{
 			Name:    "list",
 			Aliases: []string{"l"},
 			Usage:   "list all installed packages",

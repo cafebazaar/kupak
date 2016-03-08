@@ -10,7 +10,12 @@ import (
 
 // List returns all installed paks in given namespace
 func (m *Manager) List(namespace string) ([]*pak.InstalledPak, error) {
-	objects, err := m.kubectl.Get(namespace, "all", "")
+	return m.listByLabels(namespace, "")
+}
+
+// listByGroup returns installed pak with given lables
+func (m *Manager) listByLabels(namespace string, labels string) ([]*pak.InstalledPak, error) {
+	objects, err := m.kubectl.Get(namespace, "all", labels)
 	if err != nil {
 		return nil, err
 	}

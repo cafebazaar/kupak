@@ -98,13 +98,36 @@ func (k *KubectlRunner) Create(namespace string, o *Object) error {
 		args = append([]string{"--namespace", namespace}, args...)
 	}
 
+	inBuffer, err := o.Bytes()
+	if err != nil {
+		return err
+	}
+
 	cmd := exec.Command(KubePath, args...)
+	cmd.Stdin = bytes.NewBuffer(inBuffer)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("kubectl error: %v - %s", err, string(output))
+	}
+	return nil
+}
+
+// Delete implements Delete of Kubectl interface
+func (k *KubectlRunner) Delete(namespace string, o *Object) error {
+	args := []string{"delete", "-f", "-"}
+	if KubeConfig != "" {
+		args = append(args, "--kubeconfig", KubeConfig)
+	}
+	if namespace != "" {
+		args = append([]string{"--namespace", namespace}, args...)
+	}
 
 	inBuffer, err := o.Bytes()
 	if err != nil {
 		return err
 	}
 
+	cmd := exec.Command(KubePath, args...)
 	cmd.Stdin = bytes.NewBuffer(inBuffer)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
