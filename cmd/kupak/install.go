@@ -28,49 +28,72 @@ func install(c *cli.Context) {
 	}
 
 	values := make(map[string]interface{})
-
 	if c.Bool("interactive") {
-		// interactive
-		for i := range p.Properties {
-			var prompt string
-			if p.Properties[i].Default == nil {
-				prompt = fmt.Sprintf("Field \"%s\" [type: %s]? ", p.Properties[i].Name, p.Properties[i].Type)
-			} else {
-				prompt = fmt.Sprintf("Field \"%s\" [type: %s, default: %v] (return for default)? ", p.Properties[i].Name, p.Properties[i].Type, p.Properties[i].Default)
-			}
-			value, err := scanValue(prompt, p.Properties[i].Type, p.Properties[i].Default == nil)
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(-1)
-			}
-			if value != nil {
-				values[p.Properties[i].Name] = value
-			}
-		}
+		values = readValuesInteractively(p)
 	} else {
-		// read value file
-		var valuesData []byte
-		if valuesFile == "" {
-			valuesData, err = ioutil.ReadAll(os.Stdin)
-		} else {
-			valuesData, err = ioutil.ReadFile(valuesFile)
-		}
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(-1)
-		}
-		err = yaml.Unmarshal(valuesData, &values)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(-1)
-		}
+		values = readValuesFromFile(p, valuesFile)
 	}
+	fmt.Println(values)
 
-	_, err = pakManager.Install(p, c.GlobalString("namespace"), values)
+	// _, err = pakManager.Install(p, c.GlobalString("namespace"), values)
+	// if err != nil {
+	// 	fmt.Fprintln(os.Stderr, err)
+	// 	os.Exit(-1)
+	// }
+}
+
+func readValuesFromFile(p *pak.Pak, path string) map[string]interface{} {
+	values := make(map[string]interface{})
+	var valuesData []byte
+	var err error
+	if path == "" {
+		valuesData, err = ioutil.ReadAll(os.Stdin)
+	} else {
+		valuesData, err = ioutil.ReadFile(path)
+	}
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(-1)
 	}
+	err = yaml.Unmarshal(valuesData, &values)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(-1)
+	}
+	return values
+}
+
+func readValuesInteractively(p *pak.Pak) map[string]interface{} {
+	values := make(map[string]interface{})
+
+	// ask for group
+	groupValue, err := scanValue("Group Name (return for random): ", "string", false)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(-1)
+	}
+	if groupValue != nil {
+		values["group"] = groupValue.(string)
+	}
+
+	// ask for all properties
+	for i := range p.Properties {
+		var prompt string
+		if p.Properties[i].Default == nil {
+			prompt = fmt.Sprintf("Field \"%s\" [type: %s]? ", p.Properties[i].Name, p.Properties[i].Type)
+		} else {
+			prompt = fmt.Sprintf("Field \"%s\" [type: %s, default: %v] (return for default)? ", p.Properties[i].Name, p.Properties[i].Type, p.Properties[i].Default)
+		}
+		value, err := scanValue(prompt, p.Properties[i].Type, p.Properties[i].Default == nil)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(-1)
+		}
+		if value != nil {
+			values[p.Properties[i].Name] = value
+		}
+	}
+	return values
 }
 
 func scanValue(prompt string, valueType string, required bool) (interface{}, error) {
@@ -90,12 +113,10 @@ func scanValue(prompt string, valueType string, required bool) (interface{}, err
 		}
 
 		switch valueType {
-		case "string":
-			return string(value), nil
 		case "int":
 			i, err := strconv.Atoi(string(value))
 			if err != nil {
-				fmt.Println("Bad value, try again")
+				fmt.Println("given value is not an int, try again")
 				continue
 			}
 			return i, nil
@@ -106,8 +127,10 @@ func scanValue(prompt string, valueType string, required bool) (interface{}, err
 				continue
 			}
 			return b, nil
+		case "string":
+			fallthrough
 		default:
-			return value, nil
+			return string(value), nil
 		}
 	}
 }
