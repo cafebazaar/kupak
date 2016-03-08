@@ -16,3 +16,4 @@ _test
 /kupak
 glide.lock
 vendor
+.vscode
