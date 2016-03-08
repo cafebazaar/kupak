@@ -3,7 +3,7 @@ package manager
 import (
 	"fmt"
 
-	"git.cafebazaar.ir/alaee/kupak/kubectl"
+	"git.cafebazaar.ir/alaee/kupak/pkg/kubectl"
 )
 
 // Manager manages installation and deploying pak to a kubernetes cluster

@@ -1,6 +1,6 @@
 package manager
 
-import "git.cafebazaar.ir/alaee/kupak/pak"
+import "git.cafebazaar.ir/alaee/kupak/pkg/pak"
 
 // Remove deletes an installed pak
 func (m *Manager) Remove(namespace string, group string) ([]*pak.InstalledPak, error) {

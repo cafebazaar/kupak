@@ -43,10 +43,13 @@ type kubeList struct {
 // executable
 type KubectlRunner struct{}
 
+// NewKubectlRunner returns a instance of KubectlRunner that uses kubectl
+// external command to implement Kubectl interface
 func NewKubectlRunner() (*KubectlRunner, error) {
 	return &KubectlRunner{}, nil
 }
 
+// Get implements Get of Kubectl interface
 func (k *KubectlRunner) Get(namespace string, objType string, selector string) ([]*Object, error) {
 	if objType == "" {
 		objType = "all"
@@ -85,6 +88,7 @@ func (k *KubectlRunner) Get(namespace string, objType string, selector string) (
 	return objects, nil
 }
 
+// Create implements Create of Kubectl interface
 func (k *KubectlRunner) Create(namespace string, o *Object) error {
 	args := []string{"create", "-f", "-"}
 	if KubeConfig != "" {

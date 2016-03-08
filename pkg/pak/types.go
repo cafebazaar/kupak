@@ -3,7 +3,7 @@ package pak
 import (
 	"text/template"
 
-	"git.cafebazaar.ir/alaee/kupak/kubectl"
+	"git.cafebazaar.ir/alaee/kupak/pkg/kubectl"
 )
 
 // Info contains basic information about the pak that doesn't need
