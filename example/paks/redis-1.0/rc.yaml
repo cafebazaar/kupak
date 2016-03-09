@@ -1,23 +1,23 @@
 apiVersion: v1
 kind: ReplicationController
 metadata:
-  name: redis-standalone-$(.name)
+  name: redis-standalone-$(.group)
 spec:
   replicas: 1
   selector:
-    name: redis-standalone-$(.name)
+    name: redis-standalone-$(.group)
     mode: standalone
-    provider: redis-$(.name)
+    provider: redis-$(.group)
   template:
     metadata:
       labels:
-        name: redis-standalone-$(.name)
+        name: redis-standalone-$(.group)
         mode: standalone
-        provider: redis-$(.name)
-        app: redis-standalone-$(.name)
+        provider: redis-$(.group)
+        app: redis-standalone-$(.group)
     spec:
       containers:
-      - name: redis-standalone-$(.name)
+      - name: redis-standalone-$(.group)
         image: kubernetes/redis:v1
         env:
         - name: MASTER

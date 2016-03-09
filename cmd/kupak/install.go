@@ -33,7 +33,6 @@ func install(c *cli.Context) {
 	} else {
 		values = readValuesFromFile(p, valuesFile)
 	}
-	fmt.Println(values)
 
 	_, err = pakManager.Install(p, c.GlobalString("namespace"), values)
 	if err != nil {

@@ -43,7 +43,7 @@ func spec(c *cli.Context) {
 		fmt.Println("Tags:", "["+strings.Join(p.Tags, ", ")+"]")
 	}
 	fmt.Println(strings.Trim(p.Description, "\n"))
-
+    
 	fmt.Println("\nProperties:")
 	for i := range p.Properties {
 		property := p.Properties[i]

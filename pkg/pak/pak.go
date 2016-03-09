@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strconv"
 	"text/template"
 
 	"git.cafebazaar.ir/alaee/kupak/util"
@@ -89,10 +90,12 @@ func (p *Pak) ValidateValues(values map[string]interface{}) error {
 // ExecuteTemplates generate resources of a pak with given values
 func (p *Pak) ExecuteTemplates(values map[string]interface{}) ([][]byte, error) {
 	// merge default values
-	values, err := p.MergeValuesWithDefaults(values)
+	err := p.AddDefaultValues(values)
 	if err != nil {
 		return nil, err
 	}
+
+	p.normalizeValues(values)
 
 	err = p.ValidateValues(values)
 	if err != nil {
@@ -110,18 +113,41 @@ func (p *Pak) ExecuteTemplates(values map[string]interface{}) ([][]byte, error) 
 	return outputs, nil
 }
 
-// MergeValuesWithDefaults add default values for properties that not exists in values
-func (p *Pak) MergeValuesWithDefaults(values map[string]interface{}) (map[string]interface{}, error) {
-	result := make(map[string]interface{})
+// AddDefaultValues add default values for properties that not exists in values
+func (p *Pak) AddDefaultValues(values map[string]interface{}) error {
 	for i := range p.Properties {
-		value, ok := values[p.Properties[i].Name]
-		if ok {
-			result[p.Properties[i].Name] = value
-		} else if value := p.Properties[i].Default; value != nil {
-			values[p.Properties[i].Name] = value
+		_, ok := values[p.Properties[i].Name]
+		if !ok {
+			values[p.Properties[i].Name] = p.Properties[i].Default
 		}
 	}
-	return result, nil
+	return nil
+}
+
+// normalizeValues tries to convert default values to their specified type
+// like yes, true, 1, ... to boolean true
+// this should be called before ValidateValues and after AddDefaultValues
+func (p *Pak) normalizeValues(values map[string]interface{}) {
+	for i := range p.Properties {
+		v, _ := values[p.Properties[i].Name]
+		value := fmt.Sprintf("%v", v)
+		switch p.Properties[i].Type {
+		case "int":
+			n, err := strconv.Atoi(value)
+			if err == nil {
+				values[p.Properties[i].Name] = n
+			}
+		case "bool":
+			b, err := util.StringToBool(value)
+			if err == nil {
+				values[p.Properties[i].Name] = b
+			}
+		case "string":
+			fallthrough
+		default:
+			values[p.Properties[i].Name] = v
+		}
+	}
 }
 
 // FromURL reads a pak.yaml file and fetches all the resources files
