@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	"git.cafebazaar.ir/alaee/kupak/pkg/pak"
-	"git.cafebazaar.ir/alaee/kupak/util"
+	"git.cafebazaar.ir/alaee/kupak/pkg/util"
 	"github.com/codegangsta/cli"
 	"gopkg.in/yaml.v2"
 )

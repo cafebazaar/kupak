@@ -6,7 +6,7 @@ import (
 
 	"git.cafebazaar.ir/alaee/kupak/pkg/kubectl"
 	"git.cafebazaar.ir/alaee/kupak/pkg/pak"
-	"git.cafebazaar.ir/alaee/kupak/util"
+	"git.cafebazaar.ir/alaee/kupak/pkg/util"
 	"gopkg.in/yaml.v2"
 )
 

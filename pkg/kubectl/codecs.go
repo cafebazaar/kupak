@@ -3,7 +3,7 @@ package kubectl
 import (
 	"errors"
 
-	"git.cafebazaar.ir/alaee/kupak/util"
+	"git.cafebazaar.ir/alaee/kupak/pkg/util"
 	"github.com/ghodss/yaml"
 )
 

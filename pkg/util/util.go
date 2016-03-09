@@ -90,7 +90,7 @@ func GenerateRandomString(chars string, length int) string {
 }
 
 func GenerateRandomGroup() string {
-	return GenerateRandomString("abcdefghijklmnopqrstuvwxyz1234567890", 24)
+	return GenerateRandomString("abcdefghijklmnopqrstuvwxyz", 1) + GenerateRandomString("abcdefghijklmnopqrstuvwxyz1234567890", 7)
 }
 
 func StringToBool(s string) (bool, error) {
