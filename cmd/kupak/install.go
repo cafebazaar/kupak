@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 
+	"git.cafebazaar.ir/alaee/kupak/logging"
 	"git.cafebazaar.ir/alaee/kupak/pkg/pak"
 	"git.cafebazaar.ir/alaee/kupak/pkg/util"
 	"github.com/codegangsta/cli"
@@ -17,13 +18,13 @@ func install(c *cli.Context) {
 	pakURL := c.Args().First()
 	valuesFile := c.Args().Get(1)
 	if pakURL == "" {
-		fmt.Fprintln(os.Stderr, "please specify the pak")
+		logging.Error("Please specify the pak")
 		os.Exit(-1)
 	}
 
 	p, err := pak.FromURL(pakURL)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		logging.Error(fmt.Sprint(err))
 		os.Exit(-1)
 	}
 
@@ -36,7 +37,7 @@ func install(c *cli.Context) {
 
 	_, err = pakManager.Install(p, c.GlobalString("namespace"), values)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		logging.Error(fmt.Sprint(err))
 		os.Exit(-1)
 	}
 }
@@ -51,12 +52,12 @@ func readValuesFromFile(p *pak.Pak, path string) map[string]interface{} {
 		valuesData, err = ioutil.ReadFile(path)
 	}
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		logging.Error(fmt.Sprint(err))
 		os.Exit(-1)
 	}
 	err = yaml.Unmarshal(valuesData, &values)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		logging.Error(fmt.Sprint(err))
 		os.Exit(-1)
 	}
 	return values
@@ -68,7 +69,7 @@ func readValuesInteractively(p *pak.Pak) map[string]interface{} {
 	// ask for group
 	groupValue, err := scanValue("Group Name (return for random): ", "string", false)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		logging.Error(fmt.Sprint(err))
 		os.Exit(-1)
 	}
 	if groupValue != nil {
@@ -85,7 +86,7 @@ func readValuesInteractively(p *pak.Pak) map[string]interface{} {
 		}
 		value, err := scanValue(prompt, p.Properties[i].Type, p.Properties[i].Default == nil)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			logging.Error(fmt.Sprint(err))
 			os.Exit(-1)
 		}
 		if value != nil {
