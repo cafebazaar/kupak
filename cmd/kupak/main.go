@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"git.cafebazaar.ir/alaee/kupak/logging"
 	"git.cafebazaar.ir/alaee/kupak/pkg/kubectl"
 	"git.cafebazaar.ir/alaee/kupak/pkg/manager"
 	"github.com/codegangsta/cli"
@@ -14,12 +15,12 @@ var pakManager *manager.Manager
 func main() {
 	kc, err := kubectl.NewKubectlRunner()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		logging.Error(fmt.Sprintln(err))
 		os.Exit(-1)
 	}
 	pakManager, err = manager.NewManager(kc)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		logging.Error(fmt.Sprintln(err))
 		os.Exit(-1)
 	}
 

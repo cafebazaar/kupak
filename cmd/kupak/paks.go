@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"git.cafebazaar.ir/alaee/kupak/logging"
 	"git.cafebazaar.ir/alaee/kupak/pkg/pak"
 	"github.com/codegangsta/cli"
 )
@@ -12,7 +13,7 @@ import (
 func paks(c *cli.Context) {
 	repo, err := pak.RepoFromURL(c.GlobalString("repo"))
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		logging.Error(fmt.Sprint(err))
 		os.Exit(-1)
 	}
 	for i := range repo.Paks {
@@ -29,12 +30,12 @@ func paks(c *cli.Context) {
 func spec(c *cli.Context) {
 	pakURL := c.Args().First()
 	if pakURL == "" {
-		fmt.Fprintln(os.Stderr, "please specify the pak")
+		logging.Error("Please specify the pak")
 		os.Exit(-1)
 	}
 	p, err := pak.FromURL(pakURL)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "error: ", err)
+		logging.Error(fmt.Sprint(err))
 		os.Exit(-1)
 	}
 	fmt.Println("Name:", p.Name)
@@ -43,7 +44,7 @@ func spec(c *cli.Context) {
 		fmt.Println("Tags:", "["+strings.Join(p.Tags, ", ")+"]")
 	}
 	fmt.Println(strings.Trim(p.Description, "\n"))
-    
+
 	fmt.Println("\nProperties:")
 	for i := range p.Properties {
 		property := p.Properties[i]

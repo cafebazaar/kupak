@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"os"
 
+	"git.cafebazaar.ir/alaee/kupak/logging"
 	"github.com/codegangsta/cli"
 )
 
 func list(c *cli.Context) {
 	paks, err := pakManager.List(c.GlobalString("namespace"))
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		logging.Error(fmt.Sprint(err))
 		os.Exit(-1)
 	}
 	for i := range paks {
