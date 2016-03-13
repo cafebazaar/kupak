@@ -7,6 +7,7 @@ import (
 	"git.cafebazaar.ir/alaee/kupak/logging"
 	"git.cafebazaar.ir/alaee/kupak/pkg/kubectl"
 	"git.cafebazaar.ir/alaee/kupak/pkg/manager"
+	"git.cafebazaar.ir/alaee/kupak/pkg/version"
 	"github.com/codegangsta/cli"
 )
 
@@ -29,6 +30,11 @@ func main() {
 	app.Usage = "Kubernetes Package Manager"
 	app.Version = "0.1"
 	app.Commands = []cli.Command{
+		{
+			Name:   "version",
+			Usage:  "print the current version of Kupak",
+			Action: printVersion,
+		},
 		{
 			Name:    "paks",
 			Aliases: []string{"p"},
@@ -81,4 +87,8 @@ func main() {
 		},
 	}
 	app.Run(os.Args)
+}
+
+func printVersion(c *cli.Context) {
+	fmt.Printf("Kupak %v\n", version.KupakVersion)
 }
