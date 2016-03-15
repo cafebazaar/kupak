@@ -1,6 +1,8 @@
 package main
 
 import (
+	"golang.org/x/crypto/ssh/terminal"
+
 	"bufio"
 	"fmt"
 	"io/ioutil"
@@ -29,7 +31,7 @@ func install(c *cli.Context) {
 	}
 
 	values := make(map[string]interface{})
-	if c.Bool("interactive") {
+	if c.Bool("interactive") || terminal.IsTerminal(int(os.Stdin.Fd())) {
 		values = readValuesInteractively(p)
 	} else {
 		values = readValuesFromFile(p, valuesFile)
