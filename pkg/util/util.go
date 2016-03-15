@@ -14,6 +14,22 @@ import (
 
 var random *rand.Rand
 
+// githubize transforms the user/repo github address to a valid url
+func githubize(url string) (string, error) {
+	splitOnSlash := strings.Split(url, "/")
+	if len(splitOnSlash) < 3 {
+		return "", errors.New("invalid github address")
+	}
+	splitOnSlash = splitOnSlash[1:] // strip out "github.com""
+	return fmt.Sprintf("%s%s",
+		"https://",
+		path.Join("raw.githubusercontent.com",
+			splitOnSlash[0],
+			splitOnSlash[1],
+			"master",
+			path.Join(splitOnSlash[2:]...))), nil
+}
+
 func FetchURL(url string) ([]byte, error) {
 	if strings.HasPrefix(strings.ToLower(url), "http://") ||
 		strings.HasPrefix(strings.ToLower(url), "https://") {
@@ -28,6 +44,12 @@ func FetchURL(url string) ([]byte, error) {
 			return nil, err
 		}
 		return data, nil
+	} else if strings.HasPrefix(url, "github.com") {
+		var err error
+		if githubizedURL, err := githubize(url); err == nil {
+			return FetchURL(githubizedURL)
+		}
+		return []byte{}, err
 	}
 	return ioutil.ReadFile(url)
 }
