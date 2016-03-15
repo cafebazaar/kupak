@@ -36,10 +36,10 @@ func JoinURL(baseURL string, secondURL string) string {
 	// only combine path part if baseURL is url not a local file and it make sense
 	base, err := url.Parse(baseURL)
 	if err == nil {
-		base.Path = path.Join(path.Dir(base.Path), secondURL)
+		base.Path = path.Join(base.Path, secondURL)
 		return base.String()
 	}
-	return path.Join(path.Dir(baseURL), secondURL)
+	return path.Join(baseURL, secondURL)
 }
 
 func GetMapChild(keys []string, m map[string]interface{}) (interface{}, error) {
@@ -101,4 +101,13 @@ func StringToBool(s string) (bool, error) {
 		return false, nil
 	}
 	return false, fmt.Errorf("can't parse \"%s\" as boolean", s)
+}
+
+// Relative returns true when p is a relative path
+// returns false otherwise: absolute path, http(s)://url, or an address
+// with github.com prefix
+func Relative(p string) bool {
+	return len(p) == 0 || p[0] == '.' ||
+		(!strings.HasPrefix(p, "github.com") &&
+			!strings.HasPrefix(p, "http://") && !strings.HasPrefix(p, "https://"))
 }
