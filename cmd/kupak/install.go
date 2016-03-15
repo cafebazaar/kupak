@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
+	"strings"
 
 	"git.cafebazaar.ir/alaee/kupak/logging"
 	"git.cafebazaar.ir/alaee/kupak/pkg/pak"
@@ -20,6 +21,28 @@ func install(c *cli.Context) {
 	if pakURL == "" {
 		logging.Error("Please specify the pak")
 		os.Exit(-1)
+	}
+
+	if strings.Index(pakURL, "/") == -1 &&
+		!strings.HasSuffix(pakURL, ".json") &&
+		!strings.HasSuffix(pakURL, ".yaml") {
+		// it's a pak name
+		// will install from repo
+
+		nameOfPakToInstall := pakURL
+		repoAddr := c.GlobalString("repo")
+		if len(repoAddr) > 0 {
+			// TODO: change JoinURL
+			repoPaks, _ := pak.RepoFromURL(repoAddr)
+			for _, pak := range repoPaks.Paks {
+				if pak.Name == nameOfPakToInstall {
+					pakURL = pak.URL
+					if util.Relative(pakURL) {
+						pakURL = util.JoinURL(repoAddr, pakURL)
+					}
+				}
+			}
+		}
 	}
 
 	p, err := pak.FromURL(pakURL)
