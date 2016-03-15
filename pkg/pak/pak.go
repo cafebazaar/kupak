@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"path"
 	"strconv"
 	"text/template"
 
@@ -41,10 +42,15 @@ func (p *Pak) ID() string {
 	return fmt.Sprintf("%x", md5er.Sum(nil))
 }
 
+// receives a directory in which the resources can be found
 func (p *Pak) fetchAndMakeTemplates(baseURL string) error {
 	p.Templates = make([]*template.Template, len(p.ResourceURLs))
 	for i := range p.ResourceURLs {
 		url := util.JoinURL(baseURL, p.ResourceURLs[i])
+		if !util.Relative(p.ResourceURLs[i]) {
+			url = p.ResourceURLs[i]
+		}
+
 		data, err := util.FetchURL(url)
 		if err != nil {
 			return err
@@ -163,7 +169,7 @@ func FromURL(url string) (*Pak, error) {
 	if err := validateProperties(pak.Properties); err != nil {
 		return nil, err
 	}
-	if err := pak.fetchAndMakeTemplates(url); err != nil {
+	if err := pak.fetchAndMakeTemplates(path.Dir(url)); err != nil {
 		return nil, err
 	}
 	return &pak, nil

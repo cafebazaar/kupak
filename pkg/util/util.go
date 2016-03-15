@@ -14,6 +14,22 @@ import (
 
 var random *rand.Rand
 
+// githubize transforms the user/repo github address to a valid url
+func githubize(url string) (string, error) {
+	splitOnSlash := strings.Split(url, "/")
+	if len(splitOnSlash) < 3 {
+		return "", errors.New("invalid github address")
+	}
+	splitOnSlash = splitOnSlash[1:] // strip out "github.com""
+	return fmt.Sprintf("%s%s",
+		"https://",
+		path.Join("raw.githubusercontent.com",
+			splitOnSlash[0],
+			splitOnSlash[1],
+			"master",
+			path.Join(splitOnSlash[2:]...))), nil
+}
+
 func FetchURL(url string) ([]byte, error) {
 	if strings.HasPrefix(strings.ToLower(url), "http://") ||
 		strings.HasPrefix(strings.ToLower(url), "https://") {
@@ -28,6 +44,12 @@ func FetchURL(url string) ([]byte, error) {
 			return nil, err
 		}
 		return data, nil
+	} else if strings.HasPrefix(url, "github.com") {
+		var err error
+		if githubizedURL, err := githubize(url); err == nil {
+			return FetchURL(githubizedURL)
+		}
+		return []byte{}, err
 	}
 	return ioutil.ReadFile(url)
 }
@@ -36,10 +58,10 @@ func JoinURL(baseURL string, secondURL string) string {
 	// only combine path part if baseURL is url not a local file and it make sense
 	base, err := url.Parse(baseURL)
 	if err == nil {
-		base.Path = path.Join(path.Dir(base.Path), secondURL)
+		base.Path = path.Join(base.Path, secondURL)
 		return base.String()
 	}
-	return path.Join(path.Dir(baseURL), secondURL)
+	return path.Join(baseURL, secondURL)
 }
 
 func GetMapChild(keys []string, m map[string]interface{}) (interface{}, error) {
@@ -101,4 +123,13 @@ func StringToBool(s string) (bool, error) {
 		return false, nil
 	}
 	return false, fmt.Errorf("can't parse \"%s\" as boolean", s)
+}
+
+// Relative returns true when p is a relative path
+// returns false otherwise: absolute path, http(s)://url, or an address
+// with github.com prefix
+func Relative(p string) bool {
+	return len(p) == 0 || p[0] == '.' ||
+		(!strings.HasPrefix(p, "github.com") &&
+			!strings.HasPrefix(p, "http://") && !strings.HasPrefix(p, "https://"))
 }
