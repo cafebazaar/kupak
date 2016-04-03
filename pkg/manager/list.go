@@ -3,8 +3,8 @@ package manager
 import (
 	"strings"
 
-	"git.cafebazaar.ir/alaee/kupak/pkg/kubectl"
-	"git.cafebazaar.ir/alaee/kupak/pkg/pak"
+	"github.com/cafebazaar/kupak/pkg/kubectl"
+	"github.com/cafebazaar/kupak/pkg/pak"
 	"gopkg.in/yaml.v2"
 )
 

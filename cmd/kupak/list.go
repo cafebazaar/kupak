@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"git.cafebazaar.ir/alaee/kupak/logging"
+	"github.com/cafebazaar/kupak/logging"
 	"github.com/codegangsta/cli"
 )
 
