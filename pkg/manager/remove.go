@@ -1,6 +1,6 @@
 package manager
 
-import "git.cafebazaar.ir/alaee/kupak/pkg/kubectl"
+import "github.com/cafebazaar/kupak/pkg/kubectl"
 
 var removeOrder = []string{"Service", "Deployment", "ReplicationController"}
 
