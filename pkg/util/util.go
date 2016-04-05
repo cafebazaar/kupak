@@ -31,8 +31,7 @@ func githubize(url string) (string, error) {
 }
 
 func FetchURL(url string) ([]byte, error) {
-	if strings.HasPrefix(strings.ToLower(url), "http://") ||
-		strings.HasPrefix(strings.ToLower(url), "https://") {
+	if isUrl(url) {
 		c := &http.Client{}
 		resp, err := c.Get(url)
 		if err != nil {
@@ -130,6 +129,40 @@ func StringToBool(s string) (bool, error) {
 // with github.com prefix
 func Relative(p string) bool {
 	return len(p) == 0 || p[0] == '.' ||
-		(!strings.HasPrefix(p, "github.com") &&
-			!strings.HasPrefix(p, "http://") && !strings.HasPrefix(p, "https://"))
+		(!strings.HasPrefix(strings.ToLower(p), "github.com") &&
+			!isUrl(p))
+}
+
+// Gives the address to the parent node of a given directory or url
+func AddressParentNode(address string) string {
+	if isUrl(address) {
+		return urlParentNode(address)
+	}
+	return dirParentNode(address)
+}
+
+func urlParentNode(url string) string {
+	for _, urlPrefix := range urlPrefixes() {
+		if strings.HasPrefix(strings.ToLower(url), urlPrefix) {
+			return url[:len(urlPrefix)] + dirParentNode(url[len(urlPrefix):])
+		}
+	}
+	return dirParentNode(url)
+}
+
+func dirParentNode(dir string) string {
+	return path.Dir(dir)
+}
+
+func isUrl(url string) bool {
+	for _, prefix := range urlPrefixes() {
+		if strings.HasPrefix(strings.ToLower(url), prefix) {
+			return true
+		}
+	}
+	return false
+}
+
+func urlPrefixes() []string {
+	return []string{"http://", "https://"}
 }

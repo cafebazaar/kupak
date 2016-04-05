@@ -168,7 +168,7 @@ func FromURL(url string) (*Pak, error) {
 	if err := validateProperties(pak.Properties); err != nil {
 		return nil, err
 	}
-	if err := pak.fetchAndMakeTemplates(url); err != nil {
+	if err := pak.fetchAndMakeTemplates(util.AddressParentNode(url)); err != nil {
 		return nil, err
 	}
 	return &pak, nil
