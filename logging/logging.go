@@ -13,11 +13,6 @@ func init() {
 	localBackendFormatter := GoLogging.NewBackendFormatter(localBackend, format)
 	GoLogging.SetBackend(localBackendFormatter)
 	l := &localLogger{
-		messageQueue: make(chan struct {
-			string
-			int
-		}),
 		logger: goLoggingLogger}
-	go l.start()
-	RegisterLogObserver(l)
+	RegisterSynchronousLogObserver(l)
 }
