@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"git.cafebazaar.ir/alaee/kupak/logging"
-	"git.cafebazaar.ir/alaee/kupak/pkg/pak"
+	"github.com/cafebazaar/kupak/logging"
+	"github.com/cafebazaar/kupak/pkg/pak"
 	"github.com/codegangsta/cli"
 )
 

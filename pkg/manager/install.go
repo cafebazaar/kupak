@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"git.cafebazaar.ir/alaee/kupak/pkg/kubectl"
-	"git.cafebazaar.ir/alaee/kupak/pkg/pak"
-	"git.cafebazaar.ir/alaee/kupak/pkg/util"
+	"github.com/cafebazaar/kupak/pkg/kubectl"
+	"github.com/cafebazaar/kupak/pkg/pak"
+	"github.com/cafebazaar/kupak/pkg/util"
 	"gopkg.in/yaml.v2"
 )
 

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"git.cafebazaar.ir/alaee/kupak/logging"
-	"git.cafebazaar.ir/alaee/kupak/pkg/kubectl"
-	"git.cafebazaar.ir/alaee/kupak/pkg/manager"
-	"git.cafebazaar.ir/alaee/kupak/pkg/version"
+	"github.com/cafebazaar/kupak/logging"
+	"github.com/cafebazaar/kupak/pkg/kubectl"
+	"github.com/cafebazaar/kupak/pkg/manager"
+	"github.com/cafebazaar/kupak/pkg/version"
 	"github.com/codegangsta/cli"
 )
 

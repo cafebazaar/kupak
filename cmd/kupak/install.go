@@ -10,9 +10,9 @@ import (
 	"strconv"
 	"strings"
 
-	"git.cafebazaar.ir/alaee/kupak/logging"
-	"git.cafebazaar.ir/alaee/kupak/pkg/pak"
-	"git.cafebazaar.ir/alaee/kupak/pkg/util"
+	"github.com/cafebazaar/kupak/logging"
+	"github.com/cafebazaar/kupak/pkg/pak"
+	"github.com/cafebazaar/kupak/pkg/util"
 	"github.com/codegangsta/cli"
 	"gopkg.in/yaml.v2"
 )

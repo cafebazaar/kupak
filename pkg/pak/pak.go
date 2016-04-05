@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"text/template"
 
-	"git.cafebazaar.ir/alaee/kupak/pkg/util"
+	"github.com/cafebazaar/kupak/pkg/util"
 
 	"github.com/ghodss/yaml"
 )
