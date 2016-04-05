@@ -112,6 +112,50 @@ func (k *KubectlRunner) Create(namespace string, o *Object) error {
 	return nil
 }
 
+// Annotate annotate an kubernetes object
+func (k *KubectlRunner) Annotate(namespace string, objType string, selector string, annotation string) error {
+	args := []string{"annotate", "--overwrite", objType, annotation}
+	if KubeConfig != "" {
+		args = append(args, "--kubeconfig", KubeConfig)
+	}
+	if selector != "" {
+		args = append(args, "-l", selector)
+	}
+	if namespace != "" {
+		args = append(args, "--namespace", namespace)
+	}
+
+	cmd := exec.Command(KubePath, args...)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("kubectl error: %v - %s", err, string(output))
+	}
+    return nil
+}
+
+// Label label an kubernetes object
+func (k *KubectlRunner) Label(namespace string, objType string, selector string, label string) error {
+	args := []string{"label", "--overwrite", objType, label}
+	if KubeConfig != "" {
+		args = append(args, "--kubeconfig", KubeConfig)
+	}
+	if selector != "" {
+		args = append(args, "-l", selector)
+	}
+	if namespace != "" {
+		args = append(args, "--namespace", namespace)
+	}
+
+	cmd := exec.Command(KubePath, args...)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("kubectl error: %v - %s", err, string(output))
+	}
+    return nil
+}
+
+
+
 // Delete implements Delete of Kubectl interface
 func (k *KubectlRunner) Delete(namespace string, o *Object) error {
 	args := []string{"delete", "-f", "-"}

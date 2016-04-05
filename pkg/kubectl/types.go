@@ -11,6 +11,12 @@ type Kubectl interface {
 
 	// Delete deletes an object from kubernetes cluster
 	Delete(namespace string, o *Object) error
+    
+    // Label label an kubernetes object
+	Label(namespace string, objType string, selector string, label string) error
+    
+    // Annotate annotate an kubernetes object
+	Annotate(namespace string, objType string, selector string, annotation string) error
 }
 
 // Object is a represention of a Kubernetes' object
