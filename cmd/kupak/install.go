@@ -28,11 +28,16 @@ func install(c *cli.Context) {
 	if strings.Index(pakURL, "/") == -1 &&
 		!strings.HasSuffix(pakURL, ".json") &&
 		!strings.HasSuffix(pakURL, ".yaml") {
-		// it's a pak name
-		// will install from repo
 
 		nameOfPakToInstall := pakURL
 		repoAddr := c.GlobalString("repo")
+
+		// it's a pak name
+		// will install from repo
+		if logging.Verbose {
+			logging.Log("Looking for " + nameOfPakToInstall + " in " + repoAddr)
+		}
+
 		if len(repoAddr) > 0 {
 			// TODO: change JoinURL
 			repoPaks, _ := pak.RepoFromURL(repoAddr)
