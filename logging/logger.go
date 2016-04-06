@@ -9,6 +9,9 @@ var synchronousLoggerList = make([]LogObserver, 0)
 var asynchronousLoggerList = make([]LogObserver, 0)
 var loggerListMutex = &sync.Mutex{}
 
+// Verbose determines how much the program will talk during execution
+var Verbose = false
+
 // Debug logs the supplied message. Debug level.
 func Debug(context, msg string, args ...interface{}) {
 	toLog := fmt.Sprintf("[%s] %s", context, msg)

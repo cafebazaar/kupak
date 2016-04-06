@@ -85,6 +85,12 @@ func main() {
 			Usage:  "namespace",
 			EnvVar: "KUPAK_NAMESPACE",
 		},
+		cli.BoolFlag{
+			Name:        "verbose, V",
+			Usage:       "be verbose",
+			EnvVar:      "KUPAK_VERBOSE",
+			Destination: &logging.Verbose,
+		},
 	}
 	app.Run(os.Args)
 }
