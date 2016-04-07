@@ -10,6 +10,8 @@ import (
 	"path"
 	"strings"
 	"time"
+
+	"github.com/cafebazaar/kupak/logging"
 )
 
 var random *rand.Rand
@@ -18,6 +20,7 @@ var random *rand.Rand
 func githubize(url string) (string, error) {
 	splitOnSlash := strings.Split(url, "/")
 	if len(splitOnSlash) < 3 {
+		logging.Error("Invalid github address : " + url)
 		return "", errors.New("invalid github address")
 	}
 	splitOnSlash = splitOnSlash[1:] // strip out "github.com""
@@ -32,6 +35,9 @@ func githubize(url string) (string, error) {
 
 func FetchURL(url string) ([]byte, error) {
 	if isUrl(url) {
+		if logging.Verbose {
+			logging.Log("fetching URL : " + url)
+		}
 		c := &http.Client{}
 		resp, err := c.Get(url)
 		if err != nil {
@@ -44,11 +50,17 @@ func FetchURL(url string) ([]byte, error) {
 		}
 		return data, nil
 	} else if strings.HasPrefix(url, "github.com") {
+		if logging.Verbose {
+			logging.Log("github format address : " + url)
+		}
 		var err error
 		if githubizedURL, err := githubize(url); err == nil {
 			return FetchURL(githubizedURL)
 		}
 		return []byte{}, err
+	}
+	if logging.Verbose {
+		logging.Log("Reading file")
 	}
 	return ioutil.ReadFile(url)
 }

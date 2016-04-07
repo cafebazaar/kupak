@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cafebazaar/kupak/logging"
 	"github.com/cafebazaar/kupak/pkg/kubectl"
 	"github.com/cafebazaar/kupak/pkg/pak"
 	"github.com/cafebazaar/kupak/pkg/util"
+
 	"gopkg.in/yaml.v2"
 )
 
@@ -20,6 +22,9 @@ func (m *Manager) Install(pak *pak.Pak, namespace string, properties map[string]
 	} else {
 		group = util.GenerateRandomGroup()
 		properties["group"] = group
+		if logging.Verbose {
+			logging.Log("No group name supplied, generating random name: " + group)
+		}
 	}
 
 	// check for group duplication
@@ -34,6 +39,9 @@ func (m *Manager) Install(pak *pak.Pak, namespace string, properties map[string]
 	// execute the templates
 	rawObjects, err := pak.ExecuteTemplates(properties)
 	if err != nil {
+		if logging.Verbose {
+			logging.Log("failed executing properties templates")
+		}
 		return "", err
 	}
 
@@ -44,6 +52,9 @@ func (m *Manager) Install(pak *pak.Pak, namespace string, properties map[string]
 	}
 	propertiesYaml, err := yaml.Marshal(properties)
 	if err != nil {
+		if logging.Verbose {
+			logging.Log("failed Marshaling properties to yaml")
+		}
 		return "", err
 	}
 	annotations := map[string]string{

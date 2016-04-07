@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"text/template"
 
+	"github.com/cafebazaar/kupak/logging"
 	"github.com/cafebazaar/kupak/pkg/util"
 
 	"github.com/ghodss/yaml"
@@ -163,13 +164,19 @@ func FromURL(url string) (*Pak, error) {
 	}
 	pak := Pak{}
 	if err := yaml.Unmarshal(data, &pak); err != nil {
+		logging.Error("Failed to unmarshal pak .yaml file : " + url)
 		return nil, err
 	}
 	if err := validateProperties(pak.Properties); err != nil {
+		logging.Error("Failed validating pak properties : " + url)
 		return nil, err
 	}
 	if err := pak.fetchAndMakeTemplates(util.AddressParentNode(url)); err != nil {
+		logging.Log("Error making pak templates : " + url)
 		return nil, err
+	}
+	if logging.Verbose {
+		logging.Log("Successfully fetched pak file : " + url)
 	}
 	return &pak, nil
 }
