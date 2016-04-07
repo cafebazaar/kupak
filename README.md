@@ -1,4 +1,8 @@
 # Kupak - Kubernetes Package Manager
+
+[Travis]: https://travis-ci.org/cafebazaar/kupak
+[Travis Widget]: https://travis-ci.org/cafebazaar/kupak.svg?branch=master
+
 Kupak is package manager for installing and basic management of Kubernetes resources using a format called **pak**.
 
 Pak is a format for parameterizing and grouping related Kubernetes resources like pods, replication controllers and services. With kupak you could install, un-install, track and update paks in your Kubernetes cluster.
