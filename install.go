@@ -52,6 +52,9 @@ func install(c *cli.Context) {
 		}
 	}
 
+	if logging.Verbose {
+		logging.Log("Fetching " + pakURL)
+	}
 	p, err := pak.FromURL(pakURL)
 	if err != nil {
 		logging.Error(fmt.Sprint(err))
