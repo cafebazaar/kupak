@@ -1,5 +1,7 @@
 # Kupak - Kubernetes Package Manager
 
+[![Travis Widget]][Travis]
+
 [Travis]: https://travis-ci.org/cafebazaar/kupak
 [Travis Widget]: https://travis-ci.org/cafebazaar/kupak.svg?branch=master
 
