@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/cafebazaar/kupak/logging"
 	"github.com/cafebazaar/kupak/pkg/util"
 
 	"github.com/ghodss/yaml"
@@ -37,6 +38,10 @@ func RepoFromURL(repoURL string) (*Repo, error) {
 	// check if index.json or index.yaml is specified in url, if it's not add
 	// both one by one and check for it existence
 	if !strings.HasSuffix(repoURL, ".json") && !strings.HasSuffix(repoURL, ".yaml") {
+		if logging.Verbose {
+			logging.Log(repoURL + " is not an index file.")
+			logging.Log("looking for index.(yaml|json) in " + repoURL)
+		}
 		// check if .yaml exists
 		yamlURL := util.JoinURL(repoURL, "index.yaml")
 		repo, err := RepoFromURL(yamlURL)
@@ -49,15 +54,27 @@ func RepoFromURL(repoURL string) (*Repo, error) {
 		return RepoFromURL(jsonURL)
 	}
 
+	if logging.Verbose {
+		logging.Log("Fetching repository index file : " + repoURL)
+	}
 	data, err := util.FetchURL(repoURL)
 	if err != nil {
+		if logging.Verbose {
+			logging.Error("Could not fetch index file")
+		}
 		return nil, err
 	}
 	repo, err := RepoFromBytes(data)
 	if err != nil {
+		if logging.Verbose {
+			logging.Error("Could not create repo from the supplied index file")
+		}
 		return nil, err
 	}
 	repo.URL = repoURL
+	if logging.Verbose {
+		logging.Log("Successfully fetched repository index file")
+	}
 	return repo, nil
 }
 
