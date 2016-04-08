@@ -12,6 +12,10 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const (
+	RANDOM_GROUP_GENERATION_MAX_TRIES = 10
+)
+
 // Install a pak with given name and returns its group
 func (m *Manager) Install(pak *pak.Pak, namespace string, properties map[string]interface{}) (string, error) {
 	var group string
@@ -21,6 +25,16 @@ func (m *Manager) Install(pak *pak.Pak, namespace string, properties map[string]
 		group = val.(string)
 	} else {
 		group = util.GenerateRandomGroup()
+		for i := 0; i < RANDOM_GROUP_GENERATION_MAX_TRIES; i++ {
+			groupExists, err := m.HasGroup(namespace, group)
+			if err != nil {
+				return "", err
+			}
+			if !groupExists {
+				break
+			}
+			group = util.GenerateRandomGroup()
+		}
 		properties["group"] = group
 		if logging.Verbose {
 			logging.Log("No group name supplied, generating random name: " + group)
