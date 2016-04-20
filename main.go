@@ -75,7 +75,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "repo, r",
-			Value:  "src/kupak/example/index.yaml",
+			Value:  "github.com/cafebazaar/paks",
 			Usage:  "specify repo url",
 			EnvVar: "KUPAK_REPO",
 		},
