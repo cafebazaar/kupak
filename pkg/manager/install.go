@@ -41,6 +41,9 @@ func (m *Manager) Install(pak *pak.Pak, namespace string, properties map[string]
 		}
 	}
 
+	// add namespace to properties
+	properties["namespace"] = namespace
+
 	// check for group duplication
 	hasGroup, err := m.HasGroup(namespace, group)
 	if err != nil {
