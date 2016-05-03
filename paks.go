@@ -2,19 +2,16 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
-	"github.com/cafebazaar/kupak/logging"
 	"github.com/cafebazaar/kupak/pkg/pak"
 	"github.com/codegangsta/cli"
 )
 
-func paks(c *cli.Context) {
+func paks(c *cli.Context) error {
 	repo, err := pak.RepoFromURL(c.GlobalString("repo"))
 	if err != nil {
-		logging.Error(fmt.Sprint(err))
-		os.Exit(-1)
+		return cli.NewExitError(fmt.Sprintf("can't fetch paks list: %v", err.Error()), -1)
 	}
 	for i := range repo.Paks {
 		fmt.Println("- Name:", repo.Paks[i].Name)
@@ -25,18 +22,17 @@ func paks(c *cli.Context) {
 		}
 		fmt.Println(" ", strings.Trim(repo.Paks[i].Description, "\n"))
 	}
+	return nil
 }
 
-func spec(c *cli.Context) {
+func spec(c *cli.Context) error {
 	pakURL := c.Args().First()
 	if pakURL == "" {
-		logging.Error("Please specify the pak")
-		os.Exit(-1)
+		return cli.NewExitError("please specify the pak name", -1)
 	}
 	p, err := pak.FromURL(pakURL)
 	if err != nil {
-		logging.Error(fmt.Sprint(err))
-		os.Exit(-1)
+		return cli.NewExitError(fmt.Sprintf("can't fetch the specified pak: %v", err.Error()), -1)
 	}
 	fmt.Println("Name:", p.Name)
 	fmt.Println("Version:", p.Version)
@@ -56,4 +52,5 @@ func spec(c *cli.Context) {
 		}
 
 	}
+	return nil
 }

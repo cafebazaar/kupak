@@ -2,17 +2,15 @@ package main
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/cafebazaar/kupak/logging"
 	"github.com/codegangsta/cli"
 )
 
-func remove(c *cli.Context) {
+func remove(c *cli.Context) error {
 	group := c.Args().First()
 	err := pakManager.Remove(c.GlobalString("namespace"), group)
 	if err != nil {
-		logging.Error(fmt.Sprint(err))
-		os.Exit(-1)
+		return cli.NewExitError(fmt.Sprintf("error while removing the pak: %v", err.Error()), -1)
 	}
+	return nil
 }

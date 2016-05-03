@@ -2,17 +2,14 @@ package main
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/cafebazaar/kupak/logging"
 	"github.com/codegangsta/cli"
 )
 
-func list(c *cli.Context) {
+func list(c *cli.Context) error {
 	paks, err := pakManager.List(c.GlobalString("namespace"))
 	if err != nil {
-		logging.Error(fmt.Sprint(err))
-		os.Exit(-1)
+		return cli.NewExitError(fmt.Sprintf("error in fetching installed paks: %v", err.Error()), -1)
 	}
 	for i := range paks {
 		fmt.Printf("Pak URL:  %s\n", paks[i].PakURL)
@@ -36,4 +33,5 @@ func list(c *cli.Context) {
 		}
 		fmt.Println()
 	}
+	return nil
 }

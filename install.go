@@ -10,19 +10,17 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cafebazaar/kupak/logging"
 	"github.com/cafebazaar/kupak/pkg/pak"
 	"github.com/cafebazaar/kupak/pkg/util"
 	"github.com/codegangsta/cli"
 	"gopkg.in/yaml.v2"
 )
 
-func install(c *cli.Context) {
+func install(c *cli.Context) error {
 	pakURL := c.Args().First()
 	valuesFile := c.Args().Get(1)
 	if pakURL == "" {
-		logging.Error("Please specify the pak")
-		os.Exit(-1)
+		return cli.NewExitError("please specify the pak", -1)
 	}
 
 	if strings.Index(pakURL, "/") == -1 &&
@@ -32,15 +30,12 @@ func install(c *cli.Context) {
 		nameOfPakToInstall := pakURL
 		repoAddr := c.GlobalString("repo")
 
-		// it's a pak name
-		// will install from repo
-		if logging.Verbose {
-			logging.Log("Looking for " + nameOfPakToInstall + " in " + repoAddr)
-		}
-
 		if len(repoAddr) > 0 {
 			// TODO: change JoinURL
-			repoPaks, _ := pak.RepoFromURL(repoAddr)
+			repoPaks, err := pak.RepoFromURL(repoAddr)
+			if err != nil {
+				return cli.NewExitError(fmt.Sprintf("can't fetch the repo: %v", err.Error()), -1)
+			}
 			for _, pak := range repoPaks.Paks {
 				if pak.Name == nameOfPakToInstall {
 					pakURL = pak.URL
@@ -52,30 +47,29 @@ func install(c *cli.Context) {
 		}
 	}
 
-	if logging.Verbose {
-		logging.Log("Fetching " + pakURL)
-	}
 	p, err := pak.FromURL(pakURL)
 	if err != nil {
-		logging.Error(fmt.Sprint(err))
-		os.Exit(-1)
+		return cli.NewExitError(fmt.Sprintf("can't fetch the pak: %v", err.Error()), -1)
 	}
 
 	values := make(map[string]interface{})
 	if c.Bool("interactive") || terminal.IsTerminal(int(os.Stdin.Fd())) {
-		values = readValuesInteractively(p)
+		values, err = readValuesInteractively(p)
 	} else {
-		values = readValuesFromFile(p, valuesFile)
+		values, err = readValuesFromFile(p, valuesFile)
+	}
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("error in reading value: %v", err.Error()), -1)
 	}
 
 	_, err = pakManager.Install(p, c.GlobalString("namespace"), values)
 	if err != nil {
-		logging.Error(fmt.Sprint(err))
-		os.Exit(-1)
+		return cli.NewExitError(fmt.Sprintf("installation error: %v", err.Error()), -1)
 	}
+	return nil
 }
 
-func readValuesFromFile(p *pak.Pak, path string) map[string]interface{} {
+func readValuesFromFile(p *pak.Pak, path string) (map[string]interface{}, error) {
 	values := make(map[string]interface{})
 	var valuesData []byte
 	var err error
@@ -85,25 +79,19 @@ func readValuesFromFile(p *pak.Pak, path string) map[string]interface{} {
 		valuesData, err = ioutil.ReadFile(path)
 	}
 	if err != nil {
-		logging.Error(fmt.Sprint(err))
-		os.Exit(-1)
+		return nil, err
 	}
 	err = yaml.Unmarshal(valuesData, &values)
-	if err != nil {
-		logging.Error(fmt.Sprint(err))
-		os.Exit(-1)
-	}
-	return values
+	return values, err
 }
 
-func readValuesInteractively(p *pak.Pak) map[string]interface{} {
+func readValuesInteractively(p *pak.Pak) (map[string]interface{}, error) {
 	values := make(map[string]interface{})
 
 	// ask for group
 	groupValue, err := scanValue("Group Name (return for random): ", "string", false)
 	if err != nil {
-		logging.Error(fmt.Sprint(err))
-		os.Exit(-1)
+		return nil, err
 	}
 	if groupValue != nil {
 		values["group"] = groupValue.(string)
@@ -119,14 +107,13 @@ func readValuesInteractively(p *pak.Pak) map[string]interface{} {
 		}
 		value, err := scanValue(prompt, p.Properties[i].Type, p.Properties[i].Default == nil)
 		if err != nil {
-			logging.Error(fmt.Sprint(err))
-			os.Exit(-1)
+			return nil, err
 		}
 		if value != nil {
 			values[p.Properties[i].Name] = value
 		}
 	}
-	return values
+	return values, nil
 }
 
 func scanValue(prompt string, valueType string, required bool) (interface{}, error) {

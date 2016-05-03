@@ -95,6 +95,7 @@ func main() {
 	app.Run(os.Args)
 }
 
-func printVersion(c *cli.Context) {
+func printVersion(c *cli.Context) error {
 	fmt.Printf("Kupak %v\n", version.KupakVersion)
+	return nil
 }
