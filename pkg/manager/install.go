@@ -1,6 +1,7 @@
 package manager
 
 import (
+	"bytes"
 	"fmt"
 	"time"
 
@@ -81,6 +82,12 @@ func (m *Manager) Install(pak *pak.Pak, namespace string, properties map[string]
 	}
 	var objects []*kubectl.Object
 	for i := range rawObjects {
+		// kubernetes panics if there exists an empty object
+		// don't install the object if it's empty
+		if len(bytes.TrimSpace(rawObjects[i])) == 0 {
+			continue
+		}
+
 		object, err := kubectl.NewObject(rawObjects[i])
 		if err != nil {
 			return "", err
@@ -112,7 +119,13 @@ func (m *Manager) Install(pak *pak.Pak, namespace string, properties map[string]
 	// install the objects
 	for i := range objects {
 		data, _ := objects[i].Bytes()
-		fmt.Println(string(data))
+		if logging.Verbose {
+			fmt.Println(string(data))
+		} else {
+			if md, err := objects[i].Metadata(); err == nil {
+				logging.Log(fmt.Sprintf("Installing object \"%v\"", md.Name))
+			}
+		}
 		err := m.kubectl.Create(namespace, objects[i])
 		if err != nil {
 			// TODO XXXXXXXX rollback
