@@ -17,3 +17,5 @@ _test
 glide.lock
 vendor
 .vscode
+*.swp
+*.swo
