@@ -40,6 +40,12 @@ func main() {
 			Aliases: []string{"p"},
 			Usage:   "list all available paks of specified repo",
 			Action:  paks,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "ignore-repos",
+					Usage: "Ignores the repos file",
+				},
+			},
 		},
 		{
 			Name:    "install",
@@ -50,6 +56,10 @@ func main() {
 				cli.BoolFlag{
 					Name:  "interactive, i",
 					Usage: "interactive installation",
+				},
+				cli.BoolFlag{
+					Name:  "ignore-repos",
+					Usage: "Ignores the repos file",
 				},
 			},
 		},
@@ -70,6 +80,12 @@ func main() {
 			Aliases: []string{"s"},
 			Usage:   "print specification of a pak",
 			Action:  spec,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "ignore-repos",
+					Usage: "Ignores the repos file",
+				},
+			},
 		},
 	}
 	app.Flags = []cli.Flag{
