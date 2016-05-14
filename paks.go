@@ -56,7 +56,7 @@ func spec(c *cli.Context) error {
 		!strings.HasSuffix(pakURL, ".json") &&
 		!strings.HasSuffix(pakURL, ".yaml") {
 
-		nameOfPakToInstall := pakURL
+		nameOfPakToCheck := pakURL
 		repoAddr := c.GlobalString("repo")
 
 		if len(repoAddr) > 0 {
@@ -66,7 +66,7 @@ func spec(c *cli.Context) error {
 				return cli.NewExitError(fmt.Sprintf("can't fetch the repo: %v", err.Error()), -1)
 			}
 			for _, pak := range repoPaks.Paks {
-				if pak.Name == nameOfPakToInstall {
+				if pak.Name == nameOfPakToCheck {
 					pakURL = pak.URL
 					if util.Relative(pakURL) {
 						pakURL = util.JoinURL(repoAddr, pakURL)
