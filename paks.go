@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cafebazaar/kupak/pkg/pak"
 	"github.com/codegangsta/cli"
+
+	"github.com/cafebazaar/kupak/pkg/pak"
+	"github.com/cafebazaar/kupak/pkg/util"
 )
 
 func paks(c *cli.Context) error {
@@ -49,6 +51,29 @@ func spec(c *cli.Context) error {
 	pakURL := c.Args().First()
 	if pakURL == "" {
 		return cli.NewExitError("please specify the pak name", -1)
+	}
+	if strings.Index(pakURL, "/") == -1 &&
+		!strings.HasSuffix(pakURL, ".json") &&
+		!strings.HasSuffix(pakURL, ".yaml") {
+
+		nameOfPakToInstall := pakURL
+		repoAddr := c.GlobalString("repo")
+
+		if len(repoAddr) > 0 {
+			// TODO: change JoinURL
+			repoPaks, err := pak.RepoFromURL(repoAddr)
+			if err != nil {
+				return cli.NewExitError(fmt.Sprintf("can't fetch the repo: %v", err.Error()), -1)
+			}
+			for _, pak := range repoPaks.Paks {
+				if pak.Name == nameOfPakToInstall {
+					pakURL = pak.URL
+					if util.Relative(pakURL) {
+						pakURL = util.JoinURL(repoAddr, pakURL)
+					}
+				}
+			}
+		}
 	}
 	p, err := pak.FromURL(pakURL)
 	if err != nil {
