@@ -9,18 +9,38 @@ import (
 )
 
 func paks(c *cli.Context) error {
-	repo, err := pak.RepoFromURL(c.GlobalString("repo"))
-	if err != nil {
-		return cli.NewExitError(fmt.Sprintf("can't fetch paks list: %v", err.Error()), -1)
-	}
-	for i := range repo.Paks {
-		fmt.Println("- Name:", repo.Paks[i].Name)
-		fmt.Println("  Version:", repo.Paks[i].Version)
-		fmt.Println("  URL:", repo.Paks[i].URL)
-		if len(repo.Paks[i].Tags) > 0 {
-			fmt.Println("  Tags:", "["+strings.Join(repo.Paks[i].Tags, ", ")+"]")
+	repoAddresses := make([]string, 0)
+	if c.GlobalIsSet("repo") {
+		repoAddresses = append(repoAddresses, c.GlobalString("repo"))
+	} else {
+		reposFileCreateIfNotExist()
+		for _, repoEntry := range reposFileEntries() {
+			trimmed := strings.TrimSpace(repoEntry)
+			if len(trimmed) > 0 {
+				repoAddresses = append(repoAddresses, trimmed)
+			}
 		}
-		fmt.Println(" ", strings.Trim(repo.Paks[i].Description, "\n"))
+		if len(repoAddresses) == 0 {
+			repoAddresses = append(repoAddresses, "github.com/cafebazaar/paks")
+		}
+	}
+
+	for _, repoAddress := range repoAddresses {
+		repo, err := pak.RepoFromURL(repoAddress)
+		if err != nil {
+			return cli.NewExitError(fmt.Sprintf("can't fetch paks list: %v", err.Error()), -1)
+		}
+		fmt.Println("- Repository:", repoAddress)
+		for i := range repo.Paks {
+			fmt.Println("  - Name:", repo.Paks[i].Name)
+			fmt.Println("    Version:", repo.Paks[i].Version)
+			fmt.Println("    URL:", repo.Paks[i].URL)
+			if len(repo.Paks[i].Tags) > 0 {
+				fmt.Println("    Tags:", "["+strings.Join(repo.Paks[i].Tags, ", ")+"]")
+			}
+			fmt.Println("   ", strings.Trim(repo.Paks[i].Description, "\n"))
+		}
+
 	}
 	return nil
 }
