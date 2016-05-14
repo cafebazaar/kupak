@@ -13,7 +13,6 @@ const (
 
 func reposFileEntries() []string {
 	f, err := ioutil.ReadFile(reposFilePath())
-	println(reposFilePath())
 	if err != nil {
 		return make([]string, 0)
 	}
@@ -54,7 +53,7 @@ func reposFileCreateIfNotExist() error {
 	if err := os.MkdirAll(reposFileDir(), 0755); err != nil {
 		return err
 	}
-	if _, err := os.Create(reposFilePath()); err != nil {
+	if err := ioutil.WriteFile(reposFilePath(), []byte("github.com/cafebazaar/paks"), 0644); err != nil {
 		return err
 	}
 	return nil
