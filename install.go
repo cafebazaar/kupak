@@ -16,6 +16,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type installationSource struct {
+	repo    string
+	address string
+}
+
 func install(c *cli.Context) error {
 	pakURL := c.Args().First()
 	valuesFile := c.Args().Get(1)
@@ -28,21 +33,55 @@ func install(c *cli.Context) error {
 		!strings.HasSuffix(pakURL, ".yaml") {
 
 		nameOfPakToInstall := pakURL
-		repoAddr := c.GlobalString("repo")
 
-		if len(repoAddr) > 0 {
-			// TODO: change JoinURL
-			repoPaks, err := pak.RepoFromURL(repoAddr)
-			if err != nil {
-				return cli.NewExitError(fmt.Sprintf("can't fetch the repo: %v", err.Error()), -1)
+		repoAddresses := make([]string, 0)
+		if c.GlobalIsSet("repo") {
+			repoAddresses = append(repoAddresses, c.GlobalString("repo"))
+		} else {
+			reposFileCreateIfNotExist()
+			for _, repoEntry := range reposFileEntries() {
+				trimmed := strings.TrimSpace(repoEntry)
+				if len(trimmed) > 0 {
+					repoAddresses = append(repoAddresses, trimmed)
+				}
 			}
-			for _, pak := range repoPaks.Paks {
-				if pak.Name == nameOfPakToInstall {
-					pakURL = pak.URL
-					if util.Relative(pakURL) {
-						pakURL = util.JoinURL(repoAddr, pakURL)
+			if len(repoAddresses) == 0 {
+				repoAddresses = append(repoAddresses, "github.com/cafebazaar/paks")
+			}
+		}
+		sources := make([]installationSource, 0)
+		for _, repoAddr := range repoAddresses {
+			if len(repoAddr) > 0 {
+				// TODO: change JoinURL
+				repoPaks, err := pak.RepoFromURL(repoAddr)
+				if err != nil {
+					return cli.NewExitError(fmt.Sprintf("can't fetch the repo: %v", err.Error()), -1)
+				}
+				for _, pak := range repoPaks.Paks {
+					if pak.Name == nameOfPakToInstall {
+						pakURL = pak.URL
+						if util.Relative(pakURL) {
+							pakURL = util.JoinURL(repoAddr, pakURL)
+						}
+						sources = append(sources, installationSource{repoAddr, pakURL})
 					}
 				}
+			}
+		}
+		if len(sources) > 1 {
+			fmt.Println("Pak", nameOfPakToInstall, "exists in multiple repositories")
+			fmt.Println("Enter the number of the pak you want to install")
+			for i, source := range sources {
+				fmt.Printf("%d) %q from repository %q\n", i, source.address, source.repo)
+			}
+			val, err := scanValue("default=0 ?", "int", false)
+			if err != nil {
+				return err
+			}
+			if choice, good := val.(int32); good {
+				pakURL = sources[choice].address
+			} else {
+				pakURL = sources[0].address
 			}
 		}
 	}
