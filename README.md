@@ -7,11 +7,11 @@
 
 Kupak is package manager for installing and basic management of Kubernetes resources using a format called **pak**.
 
-Pak is a format for parameterizing and grouping related Kubernetes resources like pods, replication controllers and services. With kupak you could install, un-install, track and update paks in your Kubernetes cluster.
+Pak is a format for parameterizing and grouping related Kubernetes resources like pods, replication controllers and services. With kupak you can install, uninstall, track and update paks in your Kubernetes cluster.
 
 Pak supports Go text/templating for parameterization with a simple format for defining parameters and their types.
 
-See this [repo](http://x.com) for some ready-to-use paks and examples.
+See this [repo](https://github.com/cafebazaar/paks) for some ready-to-use paks and examples.
 
 ## Features
 - Simplicity
@@ -25,10 +25,30 @@ See this [repo](http://x.com) for some ready-to-use paks and examples.
 Kupak requires a working `kubectl` installed.
 
 ### Installation
-TODO
+go get -u -v github.com/cafebaazar/kupak
+
+### Repositories
+Any directory with an `index.yaml` file like [this](https://github.com/cafebazaar/paks/blob/master/index.yaml) can be a `kupak` repository. Repository address is the path to the directory in which the repository index file lives. The path can be an absolute or relative path in the local file system, over the internet with an `http(s)://` prefix, or hosted on github which is specified in the form of `github.com/user/repository`.
 
 ### Usage
-TODO
+- Browsing a repository:
+
+      `kupak paks`
+- Info of a pak in a specific repository:
+
+      `kupak --repo=github.com/cafebazaar/paks spec elasticsearch-cluster`
+- Installed paks:
+
+      `kupak list`
+- Installing a pak:
+
+      `kupak install talkative`
+- Removing a pak:
+
+      `kupak remove redis-staging2`
+- Adding a repository:
+
+      `kupak repos add github.com/cafebazaar/booker-paks booker project paks repo`
 
 ### Writing a Pak
 [See this](docs/pak.md)
