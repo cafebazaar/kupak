@@ -1,0 +1,20 @@
+hash: 5ba74fdcbb5838228fe63a66b10af2a4ba00e637794d68a74c3ba559fb212f7e
+updated: 2016-05-28T11:54:41.20840119+04:30
+imports:
+- name: github.com/cloudfoundry-incubator/candiedyaml
+  version: 99c3df83b51532e3615f851d8c2dbb638f5313bf
+- name: github.com/codegangsta/cli
+  version: 9a18ffad6c548ca4d458d4c30a8aa4d181cf92fa
+- name: github.com/ghodss/yaml
+  version: e8e0db9016175449df0e9c4b6e6995a9433a395c
+- name: github.com/nu7hatch/gouuid
+  version: 179d4d0c4d8d407a32af483c2354df1d2c91e6c3
+- name: github.com/op/go-logging
+  version: 970db520ece77730c7e4724c61121037378659d9
+- name: golang.org/x/crypto
+  version: 5bcd134fee4dd1475da17714aac19c0aa0142e2f
+  subpackages:
+  - ssh/terminal
+- name: gopkg.in/yaml.v2
+  version: a83829b6f1293c91addabc89d0571c246397bbf4
+devImports: []

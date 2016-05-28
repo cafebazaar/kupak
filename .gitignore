@@ -14,7 +14,6 @@ _test
 *.sublime-workspace
 
 /kupak
-glide.lock
 vendor
 .vscode
 *.swp
