@@ -22,7 +22,7 @@ func reposFileEntries() []string {
 func reposFileNonEmptyEntries() []string {
 	ret := make([]string, 0)
 	for _, line := range reposFileEntries() {
-		if len(line) > 0 {
+		if len(line) > 0 && strings.TrimSpace(line)[0] != '#' {
 			ret = append(ret, line)
 		}
 	}
