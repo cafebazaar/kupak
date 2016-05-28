@@ -16,7 +16,7 @@ func paks(c *cli.Context) error {
 		repoAddresses = append(repoAddresses, c.GlobalString("repo"))
 	} else {
 		reposFileCreateIfNotExist()
-		for _, repoEntry := range reposFileEntries() {
+		for _, repoEntry := range reposFileNonEmptyEntries() {
 			trimmed := strings.TrimSpace(repoEntry)
 			if len(trimmed) > 0 {
 				repoAddresses = append(repoAddresses, trimmed)
@@ -63,7 +63,7 @@ func spec(c *cli.Context) error {
 			repoAddresses = append(repoAddresses, c.GlobalString("repo"))
 		} else {
 			reposFileCreateIfNotExist()
-			for _, repoEntry := range reposFileEntries() {
+			for _, repoEntry := range reposFileNonEmptyEntries() {
 				trimmed := strings.TrimSpace(repoEntry)
 				if len(trimmed) > 0 {
 					repoAddresses = append(repoAddresses, trimmed)
