@@ -71,6 +71,26 @@ func main() {
 			Usage:   "print specification of a pak",
 			Action:  spec,
 		},
+		{
+			Name:    "repos",
+			Aliases: []string{},
+			Usage:   "Managing kupak repositories",
+			Subcommands: []cli.Command{
+				{
+					Name:    "add",
+					Aliases: []string{"a"},
+					Usage: `Adds a pak repo to kupak repos file
+   kupak repos add github.com/foo/repo [description]`,
+					Action: reposAdd,
+				},
+				{
+					Name:    "list",
+					Aliases: []string{"l", "ls"},
+					Usage:   `Lists the repos in kupak repos file`,
+					Action:  reposList,
+				},
+			},
+		},
 	}
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
