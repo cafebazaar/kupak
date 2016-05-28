@@ -1,5 +1,5 @@
-hash: 5ba74fdcbb5838228fe63a66b10af2a4ba00e637794d68a74c3ba559fb212f7e
-updated: 2016-05-28T11:54:41.20840119+04:30
+hash: 37f863bac8465604e83e0aa094be52a73ec87c559fff73fb8f2e25a42979afb1
+updated: 2016-05-28T12:09:24.535413221+04:30
 imports:
 - name: github.com/cloudfoundry-incubator/candiedyaml
   version: 99c3df83b51532e3615f851d8c2dbb638f5313bf

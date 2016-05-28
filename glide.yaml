@@ -1,4 +1,4 @@
-package: kupak
+package: github.com/cafebazaar/kupak
 import:
 - package: github.com/codegangsta/cli
 - package: github.com/ghodss/yaml

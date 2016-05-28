@@ -25,7 +25,12 @@ See this [repo](https://github.com/cafebazaar/paks) for some ready-to-use paks a
 Kupak requires a working `kubectl` installed.
 
 ### Installation
-go get -u -v github.com/cafebaazar/kupak
+```
+go get github.com/cafebaazar/kupak
+cd $GOPATH/github.com/cafebaazar/kupak
+glide install
+go build
+```
 
 ### Repositories
 Any directory with an `index.yaml` file like [this](https://github.com/cafebazaar/paks/blob/master/index.yaml) can be a `kupak` repository. Repository address is the path to the directory in which the repository index file lives. The path can be an absolute or relative path in the local file system, over the internet with an `http(s)://` prefix, or hosted on github which is specified in the form of `github.com/user/repository`.
